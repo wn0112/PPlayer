@@ -3,6 +3,7 @@ Python 2.7 + PyQt4 application. It can play mp3 and wma audio file.
 MP3_Player_launcher.py  <-- launcher file.
 
 Features:
+
 1. Play mp3 or wma file.
 
 2. Search song.
