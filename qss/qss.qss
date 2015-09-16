@@ -1,0 +1,205 @@
+﻿QMainWindow {
+	background: rgb(35, 71, 117, 255);
+	border: 1px solid black;
+}
+
+
+QSlider::groove:horizontal {						     
+	border: 1px solid white;						     
+	height: 0px;										   
+	margin: 0px 0;										 
+	left: 4px; right: 4px;						       
+}  	
+	
+QSlider::handle:horizontal {						       
+	border: 1px solid black;								 
+	width: 6px;									
+	background-color:rgba(0,0,0, 0%);
+	margin: -6px -6px -10px -2px;					  
+	border-radius: 8px;
+	border-image:url(':/icons/dot-16.png');
+}
+
+QSlider::sub-page:horizontal {						       
+	background: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(0, 255, 0, 255), stop:0.25 rgba(0, 255, 0, 255), stop:0.5 rgba(0, 255, 0, 255), stop:1 rgba(173, 157, 176, 255));
+}
+
+QScrollBar:vertical
+{
+	width:10px;
+	background:#C1E0E5;
+	margin:0px,0px,0px,0px;
+	padding-top:9px;
+	padding-bottom:9px;
+}
+
+QScrollBar::handle:vertical
+{						
+	width:10px;
+	border-style: solid;
+	background:#83ccd2;
+	border-radius: 3px;
+	border: 1px solid #BDCCDC;
+	border: none;
+	min-height:20;
+}
+
+QScrollBar::handle:vertical:hover
+{
+	background:#0089bf;
+}
+
+QScrollBar::add-line:vertical
+{
+	background-color: #C1E0E5;
+	height:10px;
+	width:10px;
+	border-image:url(:/icons/down-hover.png);
+	subcontrol-position:bottom;
+}
+
+QScrollBar::sub-line:vertical
+{
+	background-color: #C1E0E5;
+	height:10px;
+	width:10px;
+	border-image:url(:/icons/up-hover.png);
+	subcontrol-position:top;
+}
+
+QScrollBar::add-line:vertical:hover
+{
+	height:10px;
+	width:10px;
+	background:#0089bf;
+	subcontrol-position:bottom;
+	border-image:url(:/icons/down.png);
+}
+
+QScrollBar::sub-line:vertical:hover
+{
+	background:#0089bf;
+	height:10px;
+	width:10px;
+	subcontrol-position:top;
+	border-image:url(:/icons/up.png);
+}
+
+QScrollBar::add-page:vertical,QScrollBar::sub-page:vertical
+{
+	background:#C1E0E5;
+}
+
+QTableView#musiclist {
+	font-family: 微软雅黑, verdana;
+	font-size: 9px;
+	color: black;
+	background: #C1E0E5;
+	alternate-background-color: #D8E9E6;
+	selection-color: #FFFFFF;
+	selection-background-color: #2c3e50;
+	border: none;
+ }
+
+QHeaderView {
+	background-color: #C1E0E5;
+	alternate-background-color: #D8E9E6;
+}
+ 
+QHeaderView::section:vertical {
+	color: black;
+	font: 9px verdana;
+	padding: 0px 1px 0 1px;
+	border: none;
+	background: transparent;
+}
+
+
+QHeaderView::section:checked {
+	color: white;
+	font: 9px verdana;
+	font-style: Normal;
+	background: #2c3e50;
+}
+
+
+QTableView#lyric {
+	font-family: 微软雅黑, verdana;
+	font-size: 9px;
+	color: black;
+	selection-color: blue;
+	selection-background-color: transparent;
+	background: #C1E0E5;
+	padding: 0px;
+	border: none;
+}
+
+QTabWidget {
+	border: 1px solid grey;
+}
+
+QTabWidget::pane {
+	background: transparent;
+	border: 0px solid #333333;
+}
+
+QTabBar::tab {
+	background: transparent;
+	color: white;
+	height: 20px;
+	width: 100px;
+	alignment: right;
+	font-family: Verdana;
+	font-size: 10px;
+	margin: 0px;
+	padding: 0px;
+}
+
+QTabBar::tab:hover {
+	color: white;
+	font-family: Verdana;
+	font-size: 11px;
+	font-weight: bold;
+
+}
+
+QTabBar::tab:selected {
+	background-color: #C1E0E5;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	color: black;
+	margin: 0px;
+	padding: 0px;
+	font: 12px verdana; 
+	font-weight: bold;												
+}
+
+QMenu#traymenu {
+	background: #234775;
+	color: white;
+}
+QMenu::item:selected#traymenu {
+	background: #193151;
+}
+QMenu::separator#traymenu {
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+QCheckBox {
+	font: 10px verdana;
+	color: white;
+}
+
+QCheckBox::indicator:checked {
+	image: url(:/icons/checked.png);
+}
+
+QCheckBox::indicator:unchecked {
+	image: url(:/icons/unchecked.png);
+}
+
+QLabel#musicname {
+	color: white;
+	font-family: 微软雅黑, verdana;
+}
