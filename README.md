@@ -1,5 +1,5 @@
 # PPlayer
-Python 2.7 + PyQt4 application. It can play mp3 and wma audio file.
+Beautiful Music Player written in Python2.7 and PyQt4.
 
 MP3_Player_launcher.py  <-- launcher file.
 
