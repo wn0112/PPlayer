@@ -1,21 +1,25 @@
 # PPlayer
-Beautiful Music Player written in Python 2.7 and PyQt4.
+####Introduction
+Beautiful Music Player written in Python 2.7 and PyQt.
 
-MP3_Player_launcher.py  <== launcher file.
+####How to run
+ <i>MP3_Player_launcher.py</i> &nbsp;  <b><<< Launcher file.</b>
 
-Features:
+####Features:
 
-1. Play mp3 or wma file.
+* Play mp3 or wma file.
 
-2. Search song.
+* Search song.
 
-3. Lyric show. Single line or multiple lines.
+* Lyric show. Single line or multiple lines.
 
-4. Add to favorite.
+* Add to favorite.
 
-5. Play mode - single cycle, repeat all, shuffle.
+* Play mode - single cycle, repeat all, shuffle.
 
-6. Save/Open m3u file.
+* Save/Open m3u file.
 
-7. Tray icon, tray menu.
+* Tray icon, tray menu.
 
+####Screenshot
+![Screenshot](https://github.com/wn0112/PPlayer/blob/master/screenshot.png)
