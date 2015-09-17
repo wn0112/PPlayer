@@ -1,7 +1,7 @@
 # PPlayer
 Beautiful Music Player written in Python 2.7 and PyQt4.
 
-MP3_Player_launcher.py  <-- launcher file.
+MP3_Player_launcher.py  <== launcher file.
 
 Features:
 
