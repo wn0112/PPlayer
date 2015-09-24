@@ -286,6 +286,7 @@ class MainWindow(QMainWindow, QWidget):
 	def showErr(self, str):
 		msg = invalidFileMsg(self)
 		msg.setLabelText(_toUtf8(str).data())
+		self.show()
 		msg.show()
 		
 	# def showLyric(self, state):
@@ -659,12 +660,14 @@ class MainWindow(QMainWindow, QWidget):
 			self.model.setItem(curIndex, 0, QStandardItem(QIcon(QPixmap(":/icons/pos.png")), ""))
 			self.model.item(curIndex, 1).setForeground((QBrush(QColor(0, 0, 255))))
 			self.model.item(curIndex, 2).setForeground((QBrush(QColor(0, 0, 255))))
-			self.ui.tableView.scrollTo(self.model.index(curIndex, 0))
+			if self.isVisible():
+				self.ui.tableView.scrollTo(self.model.index(curIndex, 0))
 		elif self.playingTab:
 			self.model_2.setItem(curIndex, 0, QStandardItem(QIcon(QPixmap(":/icons/pos.png")), ""))
 			self.model_2.item(curIndex, 1).setForeground((QBrush(QColor(0, 0, 255))))
 			self.model_2.item(curIndex, 2).setForeground((QBrush(QColor(0, 0, 255))))
-			self.ui.tableView_2.scrollTo(self.model_2.index(curIndex, 0))
+			if self.isVisible():
+				self.ui.tableView_2.scrollTo(self.model_2.index(curIndex, 0))
 			
 	def removePos(self):
 		if self.playingTab and not len(self.favList):
@@ -1255,6 +1258,7 @@ class MainWindow(QMainWindow, QWidget):
 				self.model_2.item(index, 0).setForeground((QBrush(QColor(255, 0, 0))))
 				self.model_2.item(index, 1).setForeground((QBrush(QColor(255, 0, 0))))
 				self.model_2.item(index, 2).setForeground((QBrush(QColor(255, 0, 0))))
+			self.show()
 			msg.show()
 					
 	def setCurrentTime(self, time):  
