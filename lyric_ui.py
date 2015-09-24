@@ -147,7 +147,7 @@ class lyric_handle(QDialog):
 	
 		self.connect(self.lockBt, SIGNAL("clicked()"), self.lockLyric)
 		self.connect(self.hideBt, SIGNAL("clicked()"), self.hideLyric)
-		self.connect(self.timer, SIGNAL("timeout()"), self.close)
+		self.connect(self.timer, SIGNAL("timeout()"), self.hide)
 	
 		
 	def lockLyric(self):
