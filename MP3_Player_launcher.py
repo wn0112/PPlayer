@@ -59,7 +59,8 @@ class MainWindow(QMainWindow, QWidget):
 		self.file = QFileInfo()
 		self.history = []
 		self.lyricExists = False
-
+		self.starAllList = []
+		self.starFavList = []
 		QMainWindow.__init__(self, parent)
 		sip.setdestroyonexit(False)
 		self.setObjectName(_fromUtf8("mainwindow"))
@@ -187,7 +188,10 @@ class MainWindow(QMainWindow, QWidget):
 		self.trayIcon.activated.connect(self.trayIconActivated)
 				
 		## -- system tray icon end --
-		
+		self.connect(self.ui.tableView_2, SIGNAL("clicked(const QModelIndex&)"), self.clickStarFav)
+		self.connect(self.ui.tableView, SIGNAL("clicked(const QModelIndex&)"), self.clickStarAll)
+		self.connect(self.ui.tableView, SIGNAL("favchanged(bool, QModelIndex&)"), self.starChanged_all)
+		self.connect(self.ui.tableView_2, SIGNAL("favchanged(bool, QModelIndex&)"), self.starChanged_fav)
 		self.connect(self.ui.seekSlider, SIGNAL("sliderMoved(int)"), self.sliderMoved)
 		self.connect(self.lyric_ui, SIGNAL("lyrichide()"), self.singleLyrichide)
 		self.connect(self.lyric_ui_scroll, SIGNAL("lyrichide()"), self.multipleLyrichide)
@@ -248,8 +252,49 @@ class MainWindow(QMainWindow, QWidget):
 	def hideMainWindow(self):
 		self.showMinimized()
 		self.hide()
-			
-			
+	
+	def clickStarAll(self, index):
+		if index.column() == 4:
+			self.ui.tableView.clearSelection()
+			# selectModel = self.ui.tableView.selectionModel()
+
+			if self.model.item(index.row(), index.column()).text() == '1':
+				indexOfFav = self.favList.index(self.allList[index.row()])
+				self.removeFavorite(indexOfFav)
+			else:
+				self.addToFavorite(index)
+
+	def clickStarFav(self, index):
+		if index.column() == 4:
+			# self.ui.tableView.clearSelection()
+			self.removeFavorite(index.row())
+	
+	
+	def itemchanged(self,w):
+		print type(w)
+	
+	def starChanged_all(self, b, p):
+		# if self.ui.search.isChecked() and (len(self.searchWidget.lineEdit.text()) and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150):
+			# if b:
+				# print p.row()
+				# self.addToFavorite(self.model.index(int(self.matchID[p.row()]), 0))
+			# else:
+				# indexOfFav = self.favList.index(self.allList[int(self.matchID[p.row()])])
+				# self.removeFavorite(indexOfFav)
+		
+		# else:
+			if b:
+				self.addToFavorite(p)
+			else:
+				indexOfFav = self.favList.index(self.allList[p.row()])
+				# self.ui.tableView_2.indexWidget(self.model_2.index(indexOfFav, 4)).deleteLater()
+				self.removeFavorite(indexOfFav)
+
+	def starChanged_fav(self, b, p):
+		if not b:
+			# self.ui.tableView_2.indexWidget(self.ui.tableView_2.indexAt(p)).deleteLater()
+			self.removeFavorite(p.row())
+	
 	def showSingleLineLyric(self):
 		if self.ui.singleLine.isChecked():
 			screen = QApplication.desktop().availableGeometry()	
@@ -287,6 +332,7 @@ class MainWindow(QMainWindow, QWidget):
 		msg = invalidFileMsg(self)
 		msg.setLabelText(_toUtf8(str).data())
 		self.show()
+		self.showNormal()
 		msg.show()
 		
 	# def showLyric(self, state):
@@ -355,15 +401,31 @@ class MainWindow(QMainWindow, QWidget):
 			for item in self.playListDic:
 				if r1.exactMatch(self.playListDic[item][1].toLower()):
 					self.matchID.append(str(item))
-					lst = [QStandardItem(self.playListDic[item][0]), QStandardItem(self.playListDic[item][1]), QStandardItem(self.playListDic[item][2]), QStandardItem(self.playListDic[item][3])]
+					lst = [QStandardItem(self.playListDic[item][0]), \
+							QStandardItem(self.playListDic[item][1]), \
+							QStandardItem(self.playListDic[item][2]), \
+							QStandardItem(self.playListDic[item][3]), \
+							QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
 					self.model.appendRow(lst)
-					self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
+					curIndex = self.model.rowCount()-1
+					self.model.item(curIndex, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)					
+					if self.allList[item] in self.favList:
+						self.model.setItem(curIndex, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
+					
 		elif self.model.rowCount() != len(self.playList):
 			self.model.removeRows(0, self.model.rowCount())
 			for item in self.playListDic:
-				lst = [QStandardItem(self.playListDic[item][0]), QStandardItem(self.playListDic[item][1]), QStandardItem(self.playListDic[item][2]), QStandardItem(self.playListDic[item][3])]
+				lst = [QStandardItem(self.playListDic[item][0]), \
+						QStandardItem(self.playListDic[item][1]), \
+						QStandardItem(self.playListDic[item][2]), \
+						QStandardItem(self.playListDic[item][3]), \
+						QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
 				self.model.appendRow(lst)
+				curIndex = self.model.rowCount()-1
 				self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
+
+				if self.allList[item] in self.favList:
+					self.model.setItem(curIndex, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
 		
 	def moveEvent(self, event):
 		self.emit(SIGNAL("parentMoved(QPoint)"), event.pos() - event.oldPos())
@@ -384,13 +446,22 @@ class MainWindow(QMainWindow, QWidget):
 				self.playListDic[i] = ['', self.model.item(i, 1).text(), self.model.item(i, 2).text(), self.model.item(i, 3).text()]
 		elif self.ui.search.isChecked() and self.searchWidget.lineEdit.text():
 			self.model.removeRows(0, self.model.rowCount())
+			self.starAllList = []
+
 			for item in self.playListDic:
-				lst = [QStandardItem(self.playListDic[item][0]), QStandardItem(self.playListDic[item][1]), QStandardItem(self.playListDic[item][2]), QStandardItem(self.playListDic[item][3])]
+				lst = [QStandardItem(self.playListDic[item][0]), \
+						QStandardItem(self.playListDic[item][1]), \
+						QStandardItem(self.playListDic[item][2]), \
+						QStandardItem(self.playListDic[item][3]), \
+						QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
 				self.model.appendRow(lst)
 				self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
+			
+				if self.allList[item] in self.favList:
+					self.model.setItem(item, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
 			self.searchWidget.lineEdit.rst()
 			self.ui.search.setChecked(False)
-			self.searchWidget.hide()
+			self.searchWidget.hide()		
 			# if self.mediaObj.state() == phonon.Phonon.PlayingState:
 			self.setPos()
 		else:
@@ -462,7 +533,7 @@ class MainWindow(QMainWindow, QWidget):
 		a.sort()
 		a.reverse()
 
-		curIndex = self.playList.index(self.mediaObj.currentSource())
+		curIndex = self.allList.index(self.mediaObj.currentSource())
 		for i in a:
 			if self.ui.search.isChecked() and (len(self.searchWidget.lineEdit.text()) 
 				and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150):
@@ -478,7 +549,7 @@ class MainWindow(QMainWindow, QWidget):
 				
 			del self.allList[i]
 			
-			
+	
 		if not self.playingTab and curIndex in a:
 			self.stopPressed()
 			self.stopReleased()
@@ -516,7 +587,6 @@ class MainWindow(QMainWindow, QWidget):
 			self.playList = self.allList
 			
 		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
-
 		
 	def addToPlayList(self):
 		file = QFileDialog.getSaveFileName(self, 'Save Playlist', './', 'M3U File (*.m3u);;')
@@ -562,44 +632,78 @@ class MainWindow(QMainWindow, QWidget):
 						playlist.write(song.url().toString().toUtf8().data().decode('utf-8')+u'\n\n')
 			playlist.close()
 	
-	def addToFavorite(self):
-		selectModel = self.ui.tableView.selectionModel()
-		selectedRows = selectModel.selectedRows()
+	def addToFavorite(self, index=None):
+		if index != None:
+			selectedRows = [index]
+		else:
+			selectModel = self.ui.tableView.selectionModel()
+			selectedRows = selectModel.selectedRows()
+			for i in selectedRows:
+				self.model.setItem(i.row(), 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
+		self.ui.tableView.clearSelection()	
 		if self.ui.search.isChecked() and (len(self.searchWidget.lineEdit.text()) and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150):
 			for i in selectedRows:
 				row = self.allList[int(self.matchID[i.row()])]
 				if row in self.favList:
 					continue
-				lst = [QStandardItem(""), QStandardItem(self.model.item(i.row(), 1)), QStandardItem(self.model.item(i.row(), 2)), QStandardItem(self.model.item(i.row(), 3))]
+				lst = [QStandardItem(""), \
+						QStandardItem(self.model.item(i.row(), 1)), \
+						QStandardItem(self.model.item(i.row(), 2)), \
+						QStandardItem(self.model.item(i.row(), 3)), \
+						QStandardItem(QIcon(":/icons/favorite.png"), "1")]
 				self.model_2.appendRow(lst)	
-				self.model_2.item(self.model_2.rowCount()-1, 1).setForeground((QBrush(QColor(0, 0, 0))))
-				self.model_2.item(self.model_2.rowCount()-1, 2).setForeground((QBrush(QColor(0, 0, 0))))
+				curIndex = self.model_2.rowCount() - 1
+				self.model_2.item(curIndex, 1).setForeground((QBrush(QColor(0, 0, 0))))
+				self.model_2.item(curIndex, 2).setForeground((QBrush(QColor(0, 0, 0))))
 				self.favList.append(row)
+				self.model.setItem(i.row(), 4, QStandardItem(QIcon(':/icons/favorite.png'),'1'))
+				# cb = checkbox(self.ui.tableView_2)
+				# cb.setChecked(True)
+				# self.ui.tableView_2.setIndexWidget(self.model_2.index(curIndex, 4), cb)
+				# self.starFavList.append(cb)
 		else:
 		
 			for i in selectedRows:
 				if self.allList[i.row()] in self.favList:
 					continue
-				lst = [QStandardItem(""), QStandardItem(self.model.item(i.row(), 1)), QStandardItem(self.model.item(i.row(), 2)), QStandardItem(self.model.item(i.row(), 3))]
+				lst = [QStandardItem(""), \
+						QStandardItem(self.model.item(i.row(), 1)), \
+						QStandardItem(self.model.item(i.row(), 2)), \
+						QStandardItem(self.model.item(i.row(), 3)), \
+						QStandardItem(QIcon(':/icons/favorite.png'),'1')]
 				self.model_2.appendRow(lst)	
-				self.model_2.item(self.model_2.rowCount()-1, 1).setForeground((QBrush(QColor(0, 0, 0))))
-				self.model_2.item(self.model_2.rowCount()-1, 2).setForeground((QBrush(QColor(0, 0, 0))))
+				curIndex = self.model_2.rowCount() - 1
+				self.model_2.item(curIndex, 1).setForeground((QBrush(QColor(0, 0, 0))))
+				self.model_2.item(curIndex, 2).setForeground((QBrush(QColor(0, 0, 0))))
 				self.favList.append(self.allList[i.row()])
+				self.model.setItem(i.row(), 4, QStandardItem(QIcon(':/icons/favorite.png'),'1'))
+				# self.model.setItem(i.row(), 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
+				# cb = checkbox(self.ui.tableView_2)
+				# cb.setChecked(True)
+				# self.ui.tableView_2.setIndexWidget(self.model_2.index(curIndex, 4), cb)
+				# self.starFavList.append(cb)
+
 		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
 		
-	def removeFavorite(self):
+	def removeFavorite(self, row=None):	
 		a = []
-		selectModel = self.ui.tableView_2.selectionModel()
-		selectedRows = selectModel.selectedRows()
-		a = [ i.row() for i in selectedRows ]
-		# for i in selectedRows:
-			# a.append(i.row())
-		a.sort()
-		a.reverse()
+		if row != None:
+			a.append(row)
+		else:
+			selectModel = self.ui.tableView_2.selectionModel()
+			selectedRows = selectModel.selectedRows()
+			a = [ i.row() for i in selectedRows ]
+			# for i in selectedRows:
+				# a.append(i.row())
+			a.sort()
+			a.reverse()		
 		
 		curIndex = self.playList.index(self.mediaObj.currentSource())
 		for i in a:
+			self.model.setItem(self.allList.index(self.favList[i]), 4, QStandardItem(QIcon(":/icons/unfavorite.png"), "0"))
 			self.model_2.removeRows(i, 1)
+			# self.ui.tableView.scrollContentsBy(0,0)
+			# del self.starFavList[i]
 			del self.favList[i]
 			
 		if self.playingTab and curIndex in a:	
@@ -670,7 +774,7 @@ class MainWindow(QMainWindow, QWidget):
 				self.ui.tableView_2.scrollTo(self.model_2.index(curIndex, 0))
 			
 	def removePos(self):
-		if self.playingTab and not len(self.favList):
+		if self.playingTab and self.mediaObj.currentSource().type() == 4:
 			return
 		else:
 			curIndex = self.playList.index(self.mediaObj.currentSource())
@@ -814,7 +918,6 @@ class MainWindow(QMainWindow, QWidget):
 		self.ui.play.rst()
 		self.ui.next.rst()	
 		self.ui.stop.rst()	
-
 	
 	def resetSlider(self):
 		self.ui.currentTime.setText('00:00')
@@ -939,7 +1042,9 @@ class MainWindow(QMainWindow, QWidget):
 	def addMusicFromURL(self, url):
 		if not url.isEmpty() and url.isValid():	
 			self.allList.append(phonon.Phonon.MediaSource(url))
-			lst = [QStandardItem(''), QStandardItem(url.toString().replace(QRegExp('.*/'), '')), QStandardItem(''), QStandardItem('')]
+			lst = [QStandardItem(''), \
+					QStandardItem(url.toString().replace(QRegExp('.*/'), '')), \
+					QStandardItem(''), QStandardItem('')]
 			self.model.appendRow(lst)
 
 	def getTitle(self, file):
@@ -1116,20 +1221,20 @@ class MainWindow(QMainWindow, QWidget):
 		self.model.setHorizontalHeaderItem(1, QStandardItem("Name"))
 		self.model.setHorizontalHeaderItem(2, QStandardItem("Time"))
 		self.model.setHorizontalHeaderItem(3, QStandardItem("Bitrate"))
-		# self.model.setHorizontalHeaderItem(4, QStandardItem("Favorite"))
+		self.model.setHorizontalHeaderItem(4, QStandardItem("Favorite"))
 		self.ui.tableView.setModel(self.model)
-		self.ui.tableView.setColumnWidth(2, 40)
 		self.ui.tableView.setColumnWidth(0, 7)
+		self.ui.tableView.setColumnWidth(2, 40)
 		self.ui.tableView.setColumnWidth(3, 0)
-		# self.ui.tableView.setColumnWidth(4, 15)
+		self.ui.tableView.setColumnWidth(4, 15)
 		self.ui.tableView.setShowGrid(False)
 		self.ui.tableView.setWordWrap(False)
 		self.ui.tableView.setMouseTracking(True)
-		self.ui.tableView.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
 		self.ui.tableView.horizontalHeader().setResizeMode(0, QHeaderView.Fixed)
+		self.ui.tableView.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
 		self.ui.tableView.horizontalHeader().setResizeMode(2, QHeaderView.Fixed)
 		self.ui.tableView.horizontalHeader().setResizeMode(3, QHeaderView.Fixed)
-		# self.ui.tableView.horizontalHeader().setResizeMode(4, QHeaderView.Fixed)
+		self.ui.tableView.horizontalHeader().setResizeMode(4, QHeaderView.Fixed)
 		self.ui.tableView.verticalHeader().setResizeMode(QHeaderView.ResizeToContents)
 		self.ui.tableView.verticalHeader().setClickable(True)
 		self.ui.tableView.verticalHeader().setAlternatingRowColors(True)
@@ -1149,7 +1254,7 @@ class MainWindow(QMainWindow, QWidget):
 		# self.ui.tableView.setItemDelegateForColumn(4, longNameDelegate(self))
 		# self.ui.tableView.setItemDelegateForColumn(2, nullDelegate(self))
 		# self.ui.tableView.setItemDelegateForColumn(0, nullDelegate(self))
-		
+
 		# -- My Favorite table --
 		self.model_2 = QStandardItemModel()
 		self.model_2.setColumnCount(4)
@@ -1157,17 +1262,20 @@ class MainWindow(QMainWindow, QWidget):
 		self.model_2.setHorizontalHeaderItem(1, QStandardItem("Name"))
 		self.model_2.setHorizontalHeaderItem(2, QStandardItem("Time"))
 		self.model_2.setHorizontalHeaderItem(3, QStandardItem("Bitrate"))
+		self.model_2.setHorizontalHeaderItem(4, QStandardItem("Favorite"))
 		self.ui.tableView_2.setModel(self.model_2)
-		self.ui.tableView_2.setColumnWidth(2, 40)
 		self.ui.tableView_2.setColumnWidth(0, 7)
+		self.ui.tableView_2.setColumnWidth(2, 40)
 		self.ui.tableView_2.setColumnWidth(3, 0)
+		self.ui.tableView_2.setColumnWidth(4, 15)
 		self.ui.tableView_2.setShowGrid(False)
 		self.ui.tableView_2.setWordWrap(False)
 		self.ui.tableView_2.setMouseTracking(True)
-		self.ui.tableView_2.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
 		self.ui.tableView_2.horizontalHeader().setResizeMode(0, QHeaderView.Fixed)
+		self.ui.tableView_2.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
 		self.ui.tableView_2.horizontalHeader().setResizeMode(2, QHeaderView.Fixed)
 		self.ui.tableView_2.horizontalHeader().setResizeMode(3, QHeaderView.Fixed)
+		self.ui.tableView_2.horizontalHeader().setResizeMode(4, QHeaderView.Fixed)
 		self.ui.tableView_2.verticalHeader().setResizeMode(QHeaderView.ResizeToContents)
 		self.ui.tableView_2.verticalHeader().setClickable(True)
 		self.ui.tableView_2.verticalHeader().setDefaultAlignment(Qt.AlignCenter)
@@ -1258,6 +1366,7 @@ class MainWindow(QMainWindow, QWidget):
 				self.model_2.item(index, 0).setForeground((QBrush(QColor(255, 0, 0))))
 				self.model_2.item(index, 1).setForeground((QBrush(QColor(255, 0, 0))))
 				self.model_2.item(index, 2).setForeground((QBrush(QColor(255, 0, 0))))
+			self.showNormal()
 			self.show()
 			msg.show()
 					
@@ -1380,6 +1489,7 @@ class MainWindow(QMainWindow, QWidget):
 			reminder = QWidget()
 			reminder.setWindowIcon(QIcon(':/appicon.png'))
 			QMessageBox.warning(reminder,'Warning', 'Bad config file.', QMessageBox.Ok)
+			self.ui.emit(SIGNAL("loadCompleted()"))
 		
 	def isInTitle(self, xPos, yPos):
 		return yPos <= 25 and not (yPos <= 22 and (self.ui.closeBt.pos().x() + self.ui.closeBt.width() > xPos > self.ui.miniBt.pos().x()))
@@ -1424,18 +1534,36 @@ class MainWindow(QMainWindow, QWidget):
 
 	def appendRow(self, qlst):
 		self.allList.append(phonon.Phonon.MediaSource(qlst[3]))
-		row = [QStandardItem(""), QStandardItem(qlst[0]), QStandardItem(qlst[1]), QStandardItem(qlst[2])]
+		row = [QStandardItem(""), \
+				QStandardItem(qlst[0]), \
+				QStandardItem(qlst[1]), \
+				QStandardItem(qlst[2]), \
+				QStandardItem(QIcon(":/icons/unfavorite.png"),"0")]
 		self.model.appendRow(row)
-		self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
-
+		curIndex = self.model.rowCount()-1
+		# cb = checkbox(self.ui.tableView)
+		# self.ui.tableView.setIndexWidget(self.model.index(curIndex, 4), cb)
+		self.model.item(curIndex, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
+		# self.starAllList.append(cb)
+				
 	def appendFav(self, i):
 		self.favList.append(self.allList[i])
-		row = [QStandardItem(""), QStandardItem(self.model.item(i, 1)), QStandardItem(self.model.item(i, 2)), QStandardItem(self.model.item(i, 3))]
+		row = [QStandardItem(""), \
+				QStandardItem(self.model.item(i, 1)), \
+				QStandardItem(self.model.item(i, 2)), \
+				QStandardItem(self.model.item(i, 3)), \
+				QStandardItem(QIcon(":/icons/favorite.png"),"1")]
 		self.model_2.appendRow(row)	
-		rowCount = self.model_2.rowCount()
-		self.model_2.item(rowCount-1, 1).setForeground((QBrush(QColor(0, 0, 0))))
-		self.model_2.item(rowCount-1, 2).setForeground((QBrush(QColor(0, 0, 0))))
-		self.model_2.item(rowCount-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
+		curIndex = self.model_2.rowCount() - 1
+		self.model_2.item(curIndex, 1).setForeground((QBrush(QColor(0, 0, 0))))
+		self.model_2.item(curIndex, 2).setForeground((QBrush(QColor(0, 0, 0))))
+		self.model_2.item(curIndex, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
+		# cb = checkbox(self.ui.tableView_2)
+		# cb.setChecked(True)
+		# self.ui.tableView_2.setIndexWidget(self.model_2.index(curIndex, 4), cb)
+		# self.starFavList.append(cb)
+		# self.starAllList[i].setChecked(True)
+		self.model.setItem(i, 4, QStandardItem(QIcon(":/icons/favorite.png"),"1"))
 
 		
 class MyApplication(QApplication):
@@ -1584,7 +1712,6 @@ class longNameDelegate(QStyledItemDelegate):
 				
 	def createEditor(self, parent, option, index):
 		model = index.model()
-		# model.item(index.row(), 4).setEditable(True)
 		self.editor = checkbox(parent)
 		self.editor.connect(self.editor, SIGNAL('clicked()'), self.changeBg)
 		return self.editor
@@ -1632,15 +1759,30 @@ class nullDelegate(QStyledItemDelegate):
 	def setModelData(self, editor, model, index):
 		pass
 	
-	# def updateEditorGeometry(self, editor, option, index):
-		# pass
 
-class checkbox(QCheckBox):
+class checkbox(QFrame):
 	def __init__(self, parent=None):
 		super(checkbox, self).__init__(parent)
+		self.cbox = QCheckBox(self)
+		self.cbox.setObjectName(_fromUtf8('fav'))
+		self.cbox.setProperty("cursor", QCursor(Qt.PointingHandCursor))
+		self.horizontalLayout = QHBoxLayout(self)
+		self.horizontalLayout.setMargin(0)
+		self.horizontalLayout.addWidget(self.cbox, Qt.AlignCenter)		
+		QObject.connect(self.cbox, QtCore.SIGNAL('clicked()'), self.statechange)
+	
+	def setChecked(self, bool):
+		self.cbox.setChecked(bool)
+
+	def isChecked(self):
+		return self.cbox.isChecked()
 		
-	# def leaveEvent(self, event):
-		# self.emit(SIGNAL('leaved()'))
+	def statechange(self):
+		self.parent().parent().emit(QtCore.SIGNAL('favchanged(bool, QModelIndex&)'), self.cbox.isChecked(), self.parent().parent().indexAt(self.pos()))
+
+	def closeEvent(self, event):
+		del self.cbox
+		event.accept()
 		
 if __name__ == "__main__":
     import sys

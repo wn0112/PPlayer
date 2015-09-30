@@ -1,6 +1,6 @@
 ﻿QMainWindow {
 	background: rgb(35, 71, 117, 255);
-	border: 1px solid black;
+	border: 0px solid black;
 }
 
 
@@ -125,7 +125,7 @@ QHeaderView::section:checked {
 
 QTableView#lyric {
 	font-family: 微软雅黑, verdana;
-	font-size: 9px;
+	font-size: 10px;
 	color: black;
 	selection-color: blue;
 	selection-background-color: transparent;
@@ -187,16 +187,23 @@ QMenu::separator#traymenu {
 }
 
 QCheckBox {
-	font: 10px verdana;
 	color: white;
 }
 
 QCheckBox::indicator:checked {
-	image: url(:/icons/checked.png);
+	image: url(':/icons/checked.png');
 }
 
 QCheckBox::indicator:unchecked {
-	image: url(:/icons/unchecked.png);
+	image: url(':/icons/unchecked.png');
+}
+
+QCheckBox::indicator:checked#fav {
+	image: url(':/icons/favorite.png');
+}
+
+QCheckBox::indicator:unchecked#fav {
+	image: url(':/icons/unfavorite.png');
 }
 
 QLabel#musicname {

@@ -29,16 +29,12 @@
 <file alias="icons/music.ico">icons/music.ico</file>
 <file alias="icons/music.png">icons/music.png</file>
 <file alias="icons/next.png">icons/next.png</file>
-<file alias="icons/pause.png">icons/pause.png</file>
 <file alias="icons/pinus.png">icons/pinus.png</file>
 <file alias="icons/play.png">icons/play.png</file>
 <file alias="icons/pos.png">icons/pos.png</file>
 <file alias="icons/previous.png">icons/previous.png</file>
 <file alias="icons/quit.png">icons/quit.png</file>
-<file alias="icons/random.png">icons/random.png</file>
 <file alias="icons/ready.png">icons/ready.png</file>
-<file alias="icons/repeat.png">icons/repeat.png</file>
-<file alias="icons/repeat1.png">icons/repeat1.png</file>
 <file alias="icons/rs_16h.png">icons/rs_16h.png</file>
 <file alias="icons/rs_20h.png">icons/rs_20h.png</file>
 <file alias="icons/save.png">icons/save.png</file>
