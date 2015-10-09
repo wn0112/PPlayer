@@ -1,4 +1,4 @@
-﻿from PyQt4.QtGui import *
+from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 import images, locale
 
@@ -15,29 +15,38 @@ class myTableView(QTableView):
 		iconDelete = QIcon()
 		iconSave = QIcon()
 		iconFavorite = QIcon()								
+		iconFolder = QIcon()								
 		iconDelete.addPixmap(QPixmap(_fromUtf8(":/icons/delete.png")).copy(40, 0, 20, 20), QIcon.Normal, QIcon.Off)
 		iconSave.addPixmap(QPixmap(_fromUtf8(":/icons/save.png")).copy(40, 0, 20, 20), QIcon.Normal, QIcon.Off)
 		iconFavorite.addPixmap(QPixmap(_fromUtf8(":/icons/favorites_add.png")).copy(0, 0, 24, 24), QIcon.Normal, QIcon.Off)
+		iconFolder.addPixmap(QPixmap(_fromUtf8(":/icons/folder.png")).copy(0, 0, 20, 20), QIcon.Normal, QIcon.Off)
 			
 		self.action = QAction('&Save to playlist...', self)
 		self.actionDelete = QAction('&Delete', self)
 		self.actionFavorite = QAction('&Add to favorite', self)		
+		self.actionFolder = QAction('Open the folder', self)		
 		self.actionDelete.setIcon(iconDelete)			
 		self.action.setIcon(iconSave)			
 		self.actionFavorite.setIcon(iconFavorite)			
+		self.actionFolder.setIcon(iconFolder)			
 					
 		self.contextMenu.addAction(self.actionFavorite)
 		self.contextMenu.addSeparator()
 		self.contextMenu.addAction(self.action)
 		self.contextMenu.addSeparator()
 		self.contextMenu.addAction(self.actionDelete)
+		self.contextMenu.addSeparator()
+		self.contextMenu.addAction(self.actionFolder)
 				
 		self.connect(self.action, SIGNAL("triggered()"), self.addToPlayList)
 		self.connect(self.actionDelete, SIGNAL("triggered()"), self.delete)
 		self.connect(self.actionFavorite, SIGNAL("triggered()"), self.addToFavorite)
+		self.connect(self.actionFolder, SIGNAL("triggered()"), self.openFolder)
 		
-
 	def contextMenuEvent(self, event):
+		selectModel = self.selectionModel()
+		selectedRows = selectModel.selectedRows()
+		self.actionFolder.setEnabled(len(selectedRows) == 1)
 		self.contextMenu.exec_(event.globalPos())
 
 	def delete(self):
@@ -49,41 +58,46 @@ class myTableView(QTableView):
 	def addToFavorite(self):
 		self.emit(SIGNAL("addToFavorite()"))		
 
+	def openFolder(self):
+		self.emit(SIGNAL("openFolder()"))
+		
 class myFavoriteTable(QTableView):
 	def __init__(self, parent=None):
 		QTableView.__init__(self, parent)
 		self.contextMenu = QMenu(self)
-		# self.contextMenu.setFont(QFont("", 8))
 		iconDelete = QIcon()
 		iconSave = QIcon()
 		iconFavorite = QIcon()								
+		iconFolder = QIcon()								
 		iconDelete.addPixmap(QPixmap(_fromUtf8(":/icons/delete.png")).copy(40, 0, 20, 20), QIcon.Normal, QIcon.Off)
 		iconSave.addPixmap(QPixmap(_fromUtf8(":/icons/save.png")).copy(40, 0, 20, 20), QIcon.Normal, QIcon.Off)
 		iconFavorite.addPixmap(QPixmap(_fromUtf8(":/icons/favorites_remove.png")).copy(0, 0, 24, 24), QIcon.Normal, QIcon.Off)
-			
+		iconFolder.addPixmap(QPixmap(_fromUtf8(":/icons/folder.png")).copy(0, 0, 20, 20), QIcon.Normal, QIcon.Off)
+		
 		self.action = QAction('&Save to playlist...', self)
-		# self.actionDelete = QAction('&Delete', self)
-		self.actionFavorite = QAction('&Remove', self)		
-		# self.actionDelete.setIcon(iconDelete)			
+		self.actionFavorite = QAction('&Remove', self)	
+		self.actionFolder = QAction('Open the folder', self)						
 		self.action.setIcon(iconSave)			
-		self.actionFavorite.setIcon(iconFavorite)			
+		self.actionFavorite.setIcon(iconFavorite)	
+		self.actionFolder.setIcon(iconFolder)					
 					
 		self.contextMenu.addAction(self.actionFavorite)
-		# self.contextMenu.addSeparator()
 		self.contextMenu.addAction(self.action)
-		# self.contextMenu.addSeparator()
-		# self.contextMenu.addAction(self.actionDelete)
+		self.contextMenu.addSeparator()
+		self.contextMenu.addAction(self.actionFolder)
 				
 		self.connect(self.action, SIGNAL("triggered()"), self.addToPlayList)
-		# self.connect(self.actionDelete, SIGNAL("triggered()"), self.delete)
 		self.connect(self.actionFavorite, SIGNAL("triggered()"), self.removeFavorite)
-		
+		self.connect(self.actionFolder, SIGNAL("triggered()"), self.openFolder)
 
 	def contextMenuEvent(self, event):
+		selectModel = self.selectionModel()
+		selectedRows = selectModel.selectedRows()
+		self.actionFolder.setEnabled(len(selectedRows) == 1)
 		self.contextMenu.exec_(event.globalPos())
 
-	# def delete(self):
-		# self.emit(SIGNAL("delete()"))
+	def openFolder(self):
+		self.emit(SIGNAL("openFolder()"))
 	
 	def addToPlayList(self):
 		self.emit(SIGNAL("addToPlayList()"))
@@ -99,8 +113,10 @@ class lyricTable(QLabel):
 		c = QString(locale.getdefaultlocale()[0]).toLower()
 		if c.contains('zh_cn'):
 			fontname = '微软雅黑'
+			self.adjust = 2
 		else:
 			fontname = 'verdana'
+			self.adjust = 0
 		self.font = QFont(_fromUtf8(fontname), 8)
 		self.y = self.height()/2
 		self.cheight = 0
@@ -198,7 +214,7 @@ class lyricTable(QLabel):
 		painter.drawText(QRect(0, self.y + textRectM.height(), self.width(), self.height()), Qt.AlignHCenter | Qt.AlignTop, self.lyricLast)	
 		if textRectM.height() and self.intervel != 0:
 			self.t.stop()
-			self.t.start(self.intervel/(textRectM.height() + 2))
+			self.t.start(self.intervel/(textRectM.height() + self.adjust))
 		
 	def resizeEvent(self, event):
 		super(QLabel, self).resizeEvent(event)
