@@ -9,7 +9,7 @@ from logo import *
 from mutagen.mp3 import MP3
 from hsaudiotag import wma
 from progressslider import *
-import sip, sys, random, ConfigParser, images, re, chardet, locale, codecs, subprocess
+import sip, sys, random, ConfigParser, images, re, chardet, locale, codecs
 
 defaultcode = 'utf-8'
 
@@ -249,7 +249,6 @@ class MainWindow(QMainWindow, QWidget):
 			self.emit(SIGNAL("loadCompleted()"))
 
 	def openFolder_all(self):
-		global defaultcode
 		selectModel = self.ui.tableView.selectionModel()
 		selectedRows = selectModel.selectedRows()
 		if len(self.allList) == self.model.rowCount():
@@ -259,20 +258,19 @@ class MainWindow(QMainWindow, QWidget):
 		
 		f = QFileInfo(mediaObj.fileName())
 		try:
-			subprocess.Popen(u"explorer.exe /select, " + f.filePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
+			QProcess.startDetached("explorer.exe /select, " + f.filePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
 		except:
-			subprocess.Popen(u"explorer.exe " + f.absolutePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
+			QProcess.startDetached("explorer.exe " + f.absolutePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
 	
 	def openFolder_fav(self):
-		global defaultcode
 		selectModel = self.ui.tableView_2.selectionModel()
 		selectedRows = selectModel.selectedRows()
 		mediaObj = self.favList[selectedRows[0].row()]
 		f = QFileInfo(mediaObj.fileName())
 		try:
-			subprocess.Popen(u"explorer.exe /select, " + f.filePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
+			QProcess.startDetached("explorer.exe /select, " + f.filePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
 		except:
-			subprocess.Popen("explorer.exe " + f.absolutePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
+			QProcess.startDetached("explorer.exe " + f.absolutePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
 		
 	def hideMainWindow(self):
 		self.showMinimized()
