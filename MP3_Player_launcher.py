@@ -9,7 +9,7 @@ from logo import *
 from mutagen.mp3 import MP3
 from hsaudiotag import wma
 from progressslider import *
-import sip, sys, random, ConfigParser, images, re, chardet, locale, codecs
+import sip, sys, random, ConfigParser, images, re, chardet, locale, codecs, os
 
 defaultcode = 'utf-8'
 
@@ -57,11 +57,12 @@ class MainWindow(QMainWindow, QWidget):
 		self.fileType = ['mp3', 'wma']
 		self.file = QFileInfo()
 		self.lyricExists = False
-		
+	
 		
 		QMainWindow.__init__(self, parent)
 		sip.setdestroyonexit(False)
 		self.setObjectName(_fromUtf8("mainwindow"))
+		
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 		self.searchWidget = float_ui(self)
@@ -229,6 +230,8 @@ class MainWindow(QMainWindow, QWidget):
 		self.connect(self.ui.tableView_2, SIGNAL("addToPlayList()"), self.addToPlayList)
 		self.connect(self.ui.tableView_2, SIGNAL("removeFavorite()"), self.removeFavorite)
 		self.connect(self.ui.tableView, SIGNAL("addToFavorite()"), self.addToFavorite)
+		self.connect(self.ui.tableView, SIGNAL("openFolder()"), self.openFolder_all)
+		self.connect(self.ui.tableView_2, SIGNAL("openFolder()"), self.openFolder_fav)
 		self.connect(self, SIGNAL("autoSave(QString)"), self.exportIni)
 		self.connect(self.searchWidget.lineEdit, SIGNAL("textChanged(QString)"), self.textChanged)		
 		self.connect(self.logo, SIGNAL("loadingclosed()"), self.close)
@@ -245,6 +248,32 @@ class MainWindow(QMainWindow, QWidget):
 		else:
 			self.emit(SIGNAL("loadCompleted()"))
 
+	def openFolder_all(self):
+		global defaultcode
+		selectModel = self.ui.tableView.selectionModel()
+		selectedRows = selectModel.selectedRows()
+		if len(self.allList) == self.model.rowCount():
+			mediaObj = self.allList[selectedRows[0].row()]
+		else:
+			mediaObj = self.allList[int(self.matchID[selectedRows[0].row()])]
+		
+		f = QFileInfo(mediaObj.fileName())
+		try:
+			os.system("explorer.exe /select, %s"%f.filePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
+		except:
+			os.system("explorer.exe %s"%f.absolutePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
+	
+	def openFolder_fav(self):
+		global defaultcode
+		selectModel = self.ui.tableView_2.selectionModel()
+		selectedRows = selectModel.selectedRows()
+		mediaObj = self.favList[selectedRows[0].row()]
+		f = QFileInfo(mediaObj.fileName())
+		try:
+			os.system("explorer.exe /select, %s"%f.filePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
+		except:
+			os.system("explorer.exe %s"%f.absolutePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
+		
 	def hideMainWindow(self):
 		self.showMinimized()
 		self.hide()
@@ -638,24 +667,25 @@ class MainWindow(QMainWindow, QWidget):
 				self.favList.append(self.allList[index])
 
 				# self.model.setItem(index, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
+				self.model.item(index, 4).setText('1')
 			# 	
-			playListDic = []
-			lenOfAll = self.model.rowCount()
-			for i in xrange(lenOfAll):
-				playListDic.append(['', self.model.item(i, 1).text(), self.model.item(i, 2).text(), self.model.item(i, 3).text()])
-			self.model.removeRows(0, self.model.rowCount())
-			length = len(playListDic)
-			for i in xrange(length):
-				lst = [QStandardItem(playListDic[i][0]), \
-						QStandardItem(playListDic[i][1]), \
-						QStandardItem(playListDic[i][2]), \
-						QStandardItem(playListDic[i][3]), \
-						QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
-				self.model.appendRow(lst)
-				self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
-				if self.allList[i] in self.favList:
-					self.model.setItem(i, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
-			self.setPos()
+			# playListDic = []
+			# lenOfAll = self.model.rowCount()
+			# for i in xrange(lenOfAll):
+				# playListDic.append(['', self.model.item(i, 1).text(), self.model.item(i, 2).text(), self.model.item(i, 3).text()])
+			# self.model.removeRows(0, self.model.rowCount())
+			# length = len(playListDic)
+			# for i in xrange(length):
+				# lst = [QStandardItem(playListDic[i][0]), \
+						# QStandardItem(playListDic[i][1]), \
+						# QStandardItem(playListDic[i][2]), \
+						# QStandardItem(playListDic[i][3]), \
+						# QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
+				# self.model.appendRow(lst)
+				# self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
+				# if self.allList[i] in self.favList:
+					# self.model.setItem(i, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
+			# self.setPos()
 																
 		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
 		
@@ -1221,7 +1251,6 @@ class MainWindow(QMainWindow, QWidget):
 		self.ui.tableView.horizontalHeader().setClickable(False)
 		self.ui.tableView.horizontalHeader().hide()
 		self.ui.tableView.verticalHeader().setDefaultSectionSize(15)
-		# self.ui.tableView.setFont(QFont("verdana, thoma", 7.5))
 		self.ui.tableView.setSelectionBehavior(QAbstractItemView.SelectRows)
 		self.ui.tableView.setSelectionMode(QAbstractItemView.ExtendedSelection)
 		self.ui.tableView.setTabKeyNavigation(False)
@@ -1259,7 +1288,6 @@ class MainWindow(QMainWindow, QWidget):
 		self.ui.tableView_2.horizontalHeader().setClickable(False)
 		self.ui.tableView_2.horizontalHeader().hide()
 		self.ui.tableView_2.verticalHeader().setDefaultSectionSize(15)
-		# self.ui.tableView_2.setFont(QFont("verdana, thoma", 7.5))
 		self.ui.tableView_2.setSelectionBehavior(QAbstractItemView.SelectRows)
 		self.ui.tableView_2.setSelectionMode(QAbstractItemView.ExtendedSelection)
 		self.ui.tableView_2.setTabKeyNavigation(False)
