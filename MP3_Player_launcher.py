@@ -9,7 +9,7 @@ from logo import *
 from mutagen.mp3 import MP3
 from hsaudiotag import wma
 from progressslider import *
-import sip, sys, random, ConfigParser, images, re, chardet, locale, codecs, os
+import sip, sys, random, ConfigParser, images, re, chardet, locale, codecs, subprocess
 
 defaultcode = 'utf-8'
 
@@ -259,9 +259,9 @@ class MainWindow(QMainWindow, QWidget):
 		
 		f = QFileInfo(mediaObj.fileName())
 		try:
-			os.system("explorer.exe /select, %s"%f.filePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
+			subprocess.Popen(u"explorer.exe /select, " + f.filePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
 		except:
-			os.system("explorer.exe %s"%f.absolutePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
+			subprocess.Popen(u"explorer.exe " + f.absolutePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
 	
 	def openFolder_fav(self):
 		global defaultcode
@@ -270,9 +270,9 @@ class MainWindow(QMainWindow, QWidget):
 		mediaObj = self.favList[selectedRows[0].row()]
 		f = QFileInfo(mediaObj.fileName())
 		try:
-			os.system("explorer.exe /select, %s"%f.filePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
+			subprocess.Popen(u"explorer.exe /select, " + f.filePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
 		except:
-			os.system("explorer.exe %s"%f.absolutePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
+			subprocess.Popen("explorer.exe " + f.absolutePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
 		
 	def hideMainWindow(self):
 		self.showMinimized()
