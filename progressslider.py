@@ -79,11 +79,11 @@ class menuNameLabel(QLabel):
 		self.textRect = painter.drawText(QRect(0, -7, self.width(), 25), Qt.AlignHCenter | Qt.AlignVCenter, self.txt)
 
 		if self.textRect.width() > self.width():	
-			painter.setPen(QColor(255, 255, 255, 255))
+			painter.setPen(QColor(0, 0, 0, 255))
 			painter.drawText(QRect(self.newX, -7, self.textRect.width(), 25), Qt.AlignLeft | Qt.AlignVCenter, self.txt)
 			self.t.start(150)
 		else:
-			painter.setPen(QColor(255, 255, 255, 255));
+			painter.setPen(QColor(0, 0, 0, 255));
 			self.textRect = painter.drawText(QRect(0, -7, self.width(), 25), Qt.AlignHCenter | Qt.AlignVCenter, self.txt)
 			self.t.stop()
 			
