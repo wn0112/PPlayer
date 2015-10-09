@@ -130,7 +130,7 @@ class MainWindow(QMainWindow, QWidget):
 		self.repeatAction.setCheckable(True)
 			
 		self.trayIconMenu = QtGui.QMenu(self)
-		self.trayIconMenu.setObjectName(_fromUtf8("traymenu"))
+		# self.trayIconMenu.setObjectName(_fromUtf8("traymenu"))
 		self.playMenu = QtGui.QWidget()
 		self.playMenuAction = QtGui.QWidgetAction(self.playMenu)
 		self.playMenuAction.setDefaultWidget(self.playMenu)
@@ -170,7 +170,7 @@ class MainWindow(QMainWindow, QWidget):
 		self.trayIconMenu.addAction(self.playMenuAction)
 		self.trayIconMenu.addSeparator()
 		self.playMode = QtGui.QMenu(self.trayIconMenu)
-		self.playMode.setObjectName(_fromUtf8("traymenu"))
+		# self.playMode.setObjectName(_fromUtf8("traymenu"))
 		self.playMode.setTitle("Play &Mode")
 		self.playMode.addAction(self.shuffleAction)
 		self.playMode.addAction(self.repeat1Action)
@@ -665,25 +665,25 @@ class MainWindow(QMainWindow, QWidget):
 				self.favList.append(self.allList[index])
 
 				# self.model.setItem(index, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
-				self.model.item(index, 4).setText('1')
+				# self.model.item(index, 4).setText('1')
 			# 	
-			# playListDic = []
-			# lenOfAll = self.model.rowCount()
-			# for i in xrange(lenOfAll):
-				# playListDic.append(['', self.model.item(i, 1).text(), self.model.item(i, 2).text(), self.model.item(i, 3).text()])
-			# self.model.removeRows(0, self.model.rowCount())
-			# length = len(playListDic)
-			# for i in xrange(length):
-				# lst = [QStandardItem(playListDic[i][0]), \
-						# QStandardItem(playListDic[i][1]), \
-						# QStandardItem(playListDic[i][2]), \
-						# QStandardItem(playListDic[i][3]), \
-						# QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
-				# self.model.appendRow(lst)
-				# self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
-				# if self.allList[i] in self.favList:
-					# self.model.setItem(i, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
-			# self.setPos()
+			playListDic = []
+			lenOfAll = self.model.rowCount()
+			for i in xrange(lenOfAll):
+				playListDic.append(['', self.model.item(i, 1).text(), self.model.item(i, 2).text(), self.model.item(i, 3).text()])
+			self.model.removeRows(0, self.model.rowCount())
+			length = len(playListDic)
+			for i in xrange(length):
+				lst = [QStandardItem(playListDic[i][0]), \
+						QStandardItem(playListDic[i][1]), \
+						QStandardItem(playListDic[i][2]), \
+						QStandardItem(playListDic[i][3]), \
+						QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
+				self.model.appendRow(lst)
+				self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
+				if self.allList[i] in self.favList:
+					self.model.setItem(i, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
+			self.setPos()
 																
 		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
 		
