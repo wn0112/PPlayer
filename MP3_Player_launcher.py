@@ -48,7 +48,6 @@ class MainWindow(QMainWindow, QWidget):
 		self.border = 4
 		self.path = QString('D:/Music/')
 		self.playList = []
-		self.preList = []
 		self.allList = []
 		self.favList = []
 		self.playList = self.allList
@@ -57,14 +56,12 @@ class MainWindow(QMainWindow, QWidget):
 		self.playingTab = 0
 		self.fileType = ['mp3', 'wma']
 		self.file = QFileInfo()
-		self.history = []
 		self.lyricExists = False
-		self.starAllList = []
-		self.starFavList = []
+		
+		
 		QMainWindow.__init__(self, parent)
 		sip.setdestroyonexit(False)
 		self.setObjectName(_fromUtf8("mainwindow"))
-		
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 		self.searchWidget = float_ui(self)
