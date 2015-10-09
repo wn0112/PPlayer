@@ -31,7 +31,7 @@ class myTableView(QTableView):
 		self.actionFolder.setIcon(iconFolder)			
 					
 		self.contextMenu.addAction(self.actionFavorite)
-		self.contextMenu.addSeparator()
+		# self.contextMenu.addSeparator()
 		self.contextMenu.addAction(self.action)
 		self.contextMenu.addSeparator()
 		self.contextMenu.addAction(self.actionDelete)
