@@ -17,7 +17,7 @@ class myTableView(QTableView):
 		iconFavorite = QIcon()								
 		iconDelete.addPixmap(QPixmap(_fromUtf8(":/icons/delete.png")).copy(40, 0, 20, 20), QIcon.Normal, QIcon.Off)
 		iconSave.addPixmap(QPixmap(_fromUtf8(":/icons/save.png")).copy(40, 0, 20, 20), QIcon.Normal, QIcon.Off)
-		iconFavorite.addPixmap(QPixmap(_fromUtf8("./icons/favorites_add.png")).copy(0, 0, 24, 24), QIcon.Normal, QIcon.Off)
+		iconFavorite.addPixmap(QPixmap(_fromUtf8(":/icons/favorites_add.png")).copy(0, 0, 24, 24), QIcon.Normal, QIcon.Off)
 			
 		self.action = QAction('&Save to playlist...', self)
 		self.actionDelete = QAction('&Delete', self)
@@ -59,7 +59,7 @@ class myFavoriteTable(QTableView):
 		iconFavorite = QIcon()								
 		iconDelete.addPixmap(QPixmap(_fromUtf8(":/icons/delete.png")).copy(40, 0, 20, 20), QIcon.Normal, QIcon.Off)
 		iconSave.addPixmap(QPixmap(_fromUtf8(":/icons/save.png")).copy(40, 0, 20, 20), QIcon.Normal, QIcon.Off)
-		iconFavorite.addPixmap(QPixmap(_fromUtf8("./icons/favorites_remove.png")).copy(0, 0, 24, 24), QIcon.Normal, QIcon.Off)
+		iconFavorite.addPixmap(QPixmap(_fromUtf8(":/icons/favorites_remove.png")).copy(0, 0, 24, 24), QIcon.Normal, QIcon.Off)
 			
 		self.action = QAction('&Save to playlist...', self)
 		# self.actionDelete = QAction('&Delete', self)
