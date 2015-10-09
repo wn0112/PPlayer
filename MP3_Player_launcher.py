@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from Ui_MP3_Player import *
@@ -95,8 +95,10 @@ class MainWindow(QMainWindow, QWidget):
 		iconAbout = QIcon(QPixmap(_fromUtf8(":/icons/about.png")))
 			
 		self.open = QAction('&Open', self)
+		self.open.setShortcut(_translate("MainWindow", "Ctrl+O", None))
 		self.openURL = QAction('Open &URL...', self, triggered=self.openFileFromURL)
 		self.save = QAction('&Save as playlist...', self, triggered=self.addToPlayList)
+		self.save.setShortcut(_translate("MainWindow", "Ctrl+S", None))
 		self.settings = QAction('Settings...', self, triggered=self.settings)
 		self.about = QAction('&About', self, triggered=self.showAbout)		
 		self.save.setIcon(iconSave)			
@@ -249,7 +251,7 @@ class MainWindow(QMainWindow, QWidget):
 	def hideMainWindow(self):
 		self.showMinimized()
 		self.hide()
-	
+		
 	def clickStarAll(self, index):
 		i = index.row()
 		if index.column() == 4:
@@ -269,9 +271,6 @@ class MainWindow(QMainWindow, QWidget):
 		if index.column() == 4:
 			self.removeFavorite(index.row())
 		
-	def itemchanged(self,w):
-		print type(w)
-	
 	def showSingleLineLyric(self):
 		if self.ui.singleLine.isChecked():
 			screen = QApplication.desktop().availableGeometry()	
@@ -359,36 +358,37 @@ class MainWindow(QMainWindow, QWidget):
 		
 	def textChanged(self, Qstr):
 		r1 = QRegExp('.*'+Qstr.toLower()+'.*')
+		length = len(self.playListDic)
 		if Qstr and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150:
 			self.model.removeRows(0, self.model.rowCount())
-			self.matchID = []
-			for item in self.playListDic:
-				if r1.exactMatch(self.playListDic[item][1].toLower()):
-					self.matchID.append(str(item))
-					lst = [QStandardItem(self.playListDic[item][0]), \
-							QStandardItem(self.playListDic[item][1]), \
-							QStandardItem(self.playListDic[item][2]), \
-							QStandardItem(self.playListDic[item][3]), \
+			self.matchID = []			
+			for i in xrange(length):
+				if r1.exactMatch(self.playListDic[i][1].toLower()):
+					self.matchID.append(str(i))
+					lst = [QStandardItem(self.playListDic[i][0]), \
+							QStandardItem(self.playListDic[i][1]), \
+							QStandardItem(self.playListDic[i][2]), \
+							QStandardItem(self.playListDic[i][3]), \
 							QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
 					self.model.appendRow(lst)
 					curIndex = self.model.rowCount()-1
 					self.model.item(curIndex, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)					
-					if self.allList[item] in self.favList:
+					if self.allList[i] in self.favList:
 						self.model.setItem(curIndex, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
 					
 		elif self.model.rowCount() != len(self.playList):
 			self.model.removeRows(0, self.model.rowCount())
-			for item in self.playListDic:
-				lst = [QStandardItem(self.playListDic[item][0]), \
-						QStandardItem(self.playListDic[item][1]), \
-						QStandardItem(self.playListDic[item][2]), \
-						QStandardItem(self.playListDic[item][3]), \
+			for i in xrange(length):
+				lst = [QStandardItem(self.playListDic[i][0]), \
+						QStandardItem(self.playListDic[i][1]), \
+						QStandardItem(self.playListDic[i][2]), \
+						QStandardItem(self.playListDic[i][3]), \
 						QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
 				self.model.appendRow(lst)
 				curIndex = self.model.rowCount()-1
-				self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
+				self.model.item(curIndex, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
 
-				if self.allList[item] in self.favList:
+				if self.allList[i] in self.favList:
 					self.model.setItem(curIndex, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
 		
 	def moveEvent(self, event):
@@ -404,35 +404,31 @@ class MainWindow(QMainWindow, QWidget):
 			self.ui.search.setChecked(True)
 			self.searchWidget.move(self.pos().x()+6, self.pos().y()+self.rect().height()-self.ui.operationFrame.height()-36)
 			self.searchWidget.show()
-			self.playListDic = {}
+			self.playListDic = []
 			lenOfAll = self.model.rowCount()
 			for i in xrange(lenOfAll):
-				self.playListDic[i] = ['', self.model.item(i, 1).text(), self.model.item(i, 2).text(), self.model.item(i, 3).text()]
+				self.playListDic.append(['', self.model.item(i, 1).text(), self.model.item(i, 2).text(), self.model.item(i, 3).text()])
 		elif self.ui.search.isChecked() and self.searchWidget.lineEdit.text():
 			self.model.removeRows(0, self.model.rowCount())
-			self.starAllList = []
-
-			for item in self.playListDic:
-				lst = [QStandardItem(self.playListDic[item][0]), \
-						QStandardItem(self.playListDic[item][1]), \
-						QStandardItem(self.playListDic[item][2]), \
-						QStandardItem(self.playListDic[item][3]), \
+			length = len(self.playListDic)
+			for i in xrange(length):
+				lst = [QStandardItem(self.playListDic[i][0]), \
+						QStandardItem(self.playListDic[i][1]), \
+						QStandardItem(self.playListDic[i][2]), \
+						QStandardItem(self.playListDic[i][3]), \
 						QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
 				self.model.appendRow(lst)
 				self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
-			
-				if self.allList[item] in self.favList:
-					self.model.setItem(item, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
+				if self.allList[i] in self.favList:
+					self.model.setItem(i, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
 			self.searchWidget.lineEdit.rst()
 			self.ui.search.setChecked(False)
 			self.searchWidget.hide()		
-			# if self.mediaObj.state() == phonon.Phonon.PlayingState:
 			self.setPos()
 		else:
 			self.ui.search.setChecked(False)
 			self.searchWidget.lineEdit.rst()
 			self.searchWidget.hide()
-			# if self.mediaObj.state() == phonon.Phonon.PlayingState:
 			self.setPos()
 
 	def volumeChanged(self, q):
@@ -478,11 +474,6 @@ class MainWindow(QMainWindow, QWidget):
 		elif self.allList[index.row()].type() == 1:
 			QToolTip.showText(QCursor.pos(), title + "\n" + path.url().toString())
 		
-		# if index.column() == 4:
-			# self.model.item(index.row(), 4).setSelectable(False)
-		# else:
-			# self.model.item(index.row(), 4).setSelectable(True)
-		
 	def favoriteEntered(self, index):
 		if self.favList[index.row()].type() == 0:
 			QToolTip.showText(QCursor.pos(), self.model_2.item(index.row(), 1).text() + "\n" +self.favList[index.row()].fileName().replace("/", "\\"))
@@ -510,9 +501,14 @@ class MainWindow(QMainWindow, QWidget):
 		for i in a:
 			if self.ui.search.isChecked() and (len(self.searchWidget.lineEdit.text()) 
 				and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150):
-				
-				self.model.removeRows(self.matchID.index(str(i)), 1)
+				mindex = self.matchID.index(str(i))
+				self.model.removeRows(mindex, 1)
+				self.matchID.remove(str(i))
 				del self.playListDic[i]
+				
+				# update matchID list
+				for j in xrange(mindex, len(self.matchID)):
+					self.matchID[j] = str(int(self.matchID[j])-1)
 			else:
 				self.model.removeRows(i, 1)
 				
@@ -522,7 +518,8 @@ class MainWindow(QMainWindow, QWidget):
 				
 			del self.allList[i]
 			
-	
+				
+		# if deleted a current playing song	
 		if not self.playingTab and curIndex in a:
 			self.stopPressed()
 			self.stopReleased()
@@ -574,8 +571,6 @@ class MainWindow(QMainWindow, QWidget):
 			elif self.ui.search.isChecked() and (len(self.searchWidget.lineEdit.text()) and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150):			
 				selectModel = self.ui.tableView.selectionModel()
 				lst = [ self.allList[int(i)] for i in self.matchID ]
-				# for i in self.matchID:
-					# lst.append(self.allList[int(i)])
 			else:
 				selectModel = self.ui.tableView.selectionModel()
 				lst = self.allList
@@ -608,50 +603,65 @@ class MainWindow(QMainWindow, QWidget):
 	def addToFavorite(self, index=None):
 		selectModel = self.ui.tableView.selectionModel()
 		selectedRows = selectModel.selectedRows()
-		lines = selectModel.selection().indexes()
+		self.ui.tableView.clearSelection()	
 		icon = QIcon(':/icons/favorite.png')
-		# print QTime.currentTime()
 		if self.ui.search.isChecked() \
 			and (len(self.searchWidget.lineEdit.text()) and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150):
 			for i in selectedRows:
-				row = self.allList[int(self.matchID[i.row()])]
+				index = i.row()
+				row = self.allList[int(self.matchID[index])]
 				if row in self.favList:
 					continue
 				lst = [QStandardItem(""), \
-						QStandardItem(self.model.item(i.row(), 1)), \
-						QStandardItem(self.model.item(i.row(), 2)), \
-						QStandardItem(self.model.item(i.row(), 3)), \
+						QStandardItem(self.model.item(index, 1)), \
+						QStandardItem(self.model.item(index, 2)), \
+						QStandardItem(self.model.item(index, 3)), \
 						QStandardItem(icon, "1")]
 				self.model_2.appendRow(lst)	
 				curIndex = self.model_2.rowCount() - 1
 				self.model_2.item(curIndex, 1).setForeground((QBrush(QColor(0, 0, 0))))
 				self.model_2.item(curIndex, 2).setForeground((QBrush(QColor(0, 0, 0))))
 				self.favList.append(row)
-				self.model.setItem(i.row(), 4, QStandardItem(icon,'1'))
+				self.model.setItem(index, 4, QStandardItem(icon,'1'))
 		else:		
 			for i in selectedRows:
-				if self.allList[i.row()] in self.favList:
+				index = i.row()
+				if self.allList[index] in self.favList:
 					continue
+				# self.model.setItem(index, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
 				lst = [QStandardItem(""), \
-						QStandardItem(self.model.item(i.row(), 1)), \
-						QStandardItem(self.model.item(i.row(), 2)), \
-						QStandardItem(self.model.item(i.row(), 3)), \
-						QStandardItem(icon,'1')]
+						QStandardItem(self.model.item(index, 1)), \
+						QStandardItem(self.model.item(index, 2)), \
+						QStandardItem(self.model.item(index, 3)), \
+						QStandardItem(icon, "1")]
 				self.model_2.appendRow(lst)	
 				curIndex = self.model_2.rowCount() - 1
 				self.model_2.item(curIndex, 1).setForeground((QBrush(QColor(0, 0, 0))))
 				self.model_2.item(curIndex, 2).setForeground((QBrush(QColor(0, 0, 0))))
-				self.favList.append(self.allList[i.row()])
-				self.model.setItem(i.row(), 4, QStandardItem(icon,'1'))
-				# self.model.item(i.row(), 4).setIcon(icon)
-				# self.model.item(i.row(), 4).setText('1')
-		# print QTime.currentTime()
+				self.favList.append(self.allList[index])
 
-		for row in lines:
-			selectModel.select(row,  QItemSelectionModel.Select)
-		# self.ui.tableView.clearSelection()
+				# self.model.setItem(index, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
+			# 	
+			playListDic = []
+			lenOfAll = self.model.rowCount()
+			for i in xrange(lenOfAll):
+				playListDic.append(['', self.model.item(i, 1).text(), self.model.item(i, 2).text(), self.model.item(i, 3).text()])
+			self.model.removeRows(0, self.model.rowCount())
+			length = len(playListDic)
+			for i in xrange(length):
+				lst = [QStandardItem(playListDic[i][0]), \
+						QStandardItem(playListDic[i][1]), \
+						QStandardItem(playListDic[i][2]), \
+						QStandardItem(playListDic[i][3]), \
+						QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
+				self.model.appendRow(lst)
+				self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
+				if self.allList[i] in self.favList:
+					self.model.setItem(i, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
+			self.setPos()
+																
 		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
-		# print QTime.currentTime()
+		
 	def removeFavorite(self, row=None):	
 		a = []
 		if row != None:
@@ -662,11 +672,8 @@ class MainWindow(QMainWindow, QWidget):
 			a = [ i.row() for i in selectedRows ]
 			a.sort()
 			a.reverse()		
-			
-		# save selection of tableView
-		selectModel1 = self.ui.tableView.selectionModel()
-		lines = selectModel1.selection().indexes()
-		
+
+		self.ui.tableView.clearSelection()			
 		if self.mediaObj.currentSource().type() != 4:
 			curIndex = self.playList.index(self.mediaObj.currentSource())
 		else:
@@ -692,11 +699,7 @@ class MainWindow(QMainWindow, QWidget):
 					self.mediaObj.setCurrentSource(self.favList[curIndex])
 			else:
 				self.mediaObj.clear()
-				self.current = 0
-				
-		# restore selection of tableView
-		for row in lines:
-			selectModel1.select(row,  QItemSelectionModel.Select)	
+				self.current = 0	
 			
 		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
 			
@@ -734,29 +737,19 @@ class MainWindow(QMainWindow, QWidget):
 		if (self.ui.search.isChecked() and (len(self.searchWidget.lineEdit.text()) 
 			and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150)):
 			return
-			
+		
 		curIndex = self.playList.index(self.mediaObj.currentSource())
 		if not self.playingTab:
-			selectModel = self.ui.tableView.selectionModel()
-			lines = selectModel.selection().indexes()
+			self.ui.tableView.clearSelection()	
 			self.model.setItem(curIndex, 0, QStandardItem(QIcon(QPixmap(":/icons/pos.png")), ""))
 			self.model.item(curIndex, 1).setForeground((QBrush(QColor(0, 0, 255))))
 			self.model.item(curIndex, 2).setForeground((QBrush(QColor(0, 0, 255))))
-			for row in lines:
-				selectModel.select(row,  QItemSelectionModel.Select)
-			if self.isVisible():
-				self.ui.tableView.scrollTo(self.model.index(curIndex, 0))								
+							
 		elif self.playingTab:
-			selectModel = self.ui.tableView_2.selectionModel()
-			lines = selectModel.selection().indexes()
+			self.ui.tableView_2.clearSelection()	
 			self.model_2.setItem(curIndex, 0, QStandardItem(QIcon(QPixmap(":/icons/pos.png")), ""))
 			self.model_2.item(curIndex, 1).setForeground((QBrush(QColor(0, 0, 255))))
 			self.model_2.item(curIndex, 2).setForeground((QBrush(QColor(0, 0, 255))))
-			for row in lines:
-				selectModel.select(row,  QItemSelectionModel.Select)
-			if self.isVisible():
-				self.ui.tableView_2.scrollTo(self.model_2.index(curIndex, 0))
-			
 			
 	def removePos(self):
 		if self.playingTab and self.mediaObj.currentSource().type() == 4:
@@ -765,22 +758,17 @@ class MainWindow(QMainWindow, QWidget):
 			curIndex = self.playList.index(self.mediaObj.currentSource())
 			
 		if self.playingTab:
-			selectModel = self.ui.tableView_2.selectionModel()
-			lines = selectModel.selection().indexes()
+			self.ui.tableView.clearSelection()	
 			self.model_2.setItem(curIndex, 0, QStandardItem(""))
 			self.model_2.item(curIndex, 1).setForeground((QBrush(QColor(0, 0, 0))))
 			self.model_2.item(curIndex, 2).setForeground((QBrush(QColor(0, 0, 0))))
-			for row in lines:
-				selectModel.select(row,  QItemSelectionModel.Select)
+
 		else:
-			selectModel = self.ui.tableView.selectionModel()
-			lines = selectModel.selection().indexes()
+			self.ui.tableView_2.clearSelection()	
 			self.model.setItem(curIndex, 0, QStandardItem(""))
 			self.model.item(curIndex, 1).setForeground((QBrush(QColor(0, 0, 0))))
 			self.model.item(curIndex, 2).setForeground((QBrush(QColor(0, 0, 0))))
-			for row in lines:
-				selectModel.select(row,  QItemSelectionModel.Select)
-
+			
 	def debug(self):
 		print "self.playingTab=", self.playingTab
 		print "len of playList", len(self.playList)
@@ -810,8 +798,7 @@ class MainWindow(QMainWindow, QWidget):
 		self.emit(SIGNAL('listdoubleclicked(int)'), index.row())
 			
 	def doubleClickedFavoriteTable(self, index):
-		selectModel = self.ui.tableView.selectionModel()
-		lines = selectModel.selection().indexes()
+		self.ui.tableView.clearSelection()	
 		self.removePos()
 		self.playList = self.favList
 		self.ui.tableView_2.clearSelection()
@@ -819,9 +806,6 @@ class MainWindow(QMainWindow, QWidget):
 		self.mediaObj.setCurrentSource(self.playList[index.row()])
 		self.resetSlider()
 		self.playPressed()
-		for row in lines:
-			selectModel.select(row,  QItemSelectionModel.Select)
-		self.ui.tableView.viewport().update()
 		self.emit(SIGNAL('listdoubleclicked(int)'), index.row())
 	
 	def nextSong(self):
@@ -1018,7 +1002,7 @@ class MainWindow(QMainWindow, QWidget):
 			self.th1 = myThread(self, self.audioFiles, fav)
 			self.connect(self.th1, SIGNAL("appendrow(QStringList)"), self.appendRow)
 			self.connect(self.th1, SIGNAL("appendfav(int)"), self.appendFav)
-			print QTime().currentTime()
+			# print QTime().currentTime()
 			self.th1.start()
 
 	def loadCompleted(self):
@@ -1035,7 +1019,7 @@ class MainWindow(QMainWindow, QWidget):
 		self.movie.stop()
 		# self.th1.quit()
 		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
-		print QTime().currentTime()
+		# print QTime().currentTime()
 		
 	def addMusicFromURL(self, url):
 		if not url.isEmpty() and url.isValid():	
@@ -1295,9 +1279,16 @@ class MainWindow(QMainWindow, QWidget):
 			name = self.model_2.item(index, 1).text()
 			bitrate =  self.model_2.item(index, 3).text()
 		else:
-			time = self.model.item(index, 2).text()	
-			name = self.model.item(index, 1).text()			
-			bitrate = self.model.item(index, 3).text()			
+			if self.ui.search.isChecked() and (len(self.searchWidget.lineEdit.text()) 
+				and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150):
+				
+				time = self.playListDic[index][2]
+				name = self.playListDic[index][1]			
+				bitrate = self.playListDic[index][3]
+			else:
+				time = self.model.item(index, 2).text()	
+				name = self.model.item(index, 1).text()			
+				bitrate = self.model.item(index, 3).text()			
 		self.ui.playTime.setText(time)
 		totalTime = QTime().fromString(time, 'mm:ss')
 		self.ui.seekSlider.setRange(0, QTime().msecsTo(totalTime))
@@ -1553,7 +1544,24 @@ class MainWindow(QMainWindow, QWidget):
 		self.model_2.item(curIndex, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
 		self.model.setItem(i, 4, QStandardItem(QIcon(":/icons/favorite.png"),"1"))
 
-		
+	def keyPressEvent(self, event):
+		if event.modifiers() == Qt.ControlModifier:
+			if event.key() == Qt.Key_A:
+				if self.ui.tabWidget.currentIndex():
+					selectModel = self.ui.tableView_2.selectionModel()	
+					rowCount = self.model_2.rowCount()
+					columnCount = self.model_2.columnCount()
+					selectModel.select(QItemSelection(self.model_2.index(0, 0),self.model_2.index(rowCount-1, columnCount-1)),  QItemSelectionModel.Select)
+				else:
+					selectModel = self.ui.tableView.selectionModel()
+					rowCount = self.model.rowCount()
+					columnCount = self.model.columnCount()
+					selectModel.select(QItemSelection(self.model.index(0, 0),self.model.index(rowCount-1, columnCount-1)),  QItemSelectionModel.Select)
+			elif event.key() == Qt.Key_S:
+				self.addToPlayList()				
+			elif event.key() == Qt.Key_O:
+				self.addMusic()
+				
 class MyApplication(QApplication):
 	
 	def __init__(self, args):
@@ -1732,7 +1740,6 @@ class longNameDelegate(QStyledItemDelegate):
 			self.closeEditor.emit(self.editor, 0)
 		except:
 			pass
-
 		
 class nullDelegate(QStyledItemDelegate):
 	def __init__(self, parent=None):
@@ -1747,7 +1754,6 @@ class nullDelegate(QStyledItemDelegate):
 	def setModelData(self, editor, model, index):
 		pass
 	
-
 class checkbox(QFrame):
 	def __init__(self, parent=None):
 		super(checkbox, self).__init__(parent)
