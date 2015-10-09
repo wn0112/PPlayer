@@ -303,7 +303,6 @@ class lyric_ui_scroll(QDialog):
 		
 		painter.setPen(QColor(self.curColor));
 		painter.drawText(QRect(0, self.y - textRectM1.height(), self.width(), textRectM1.height()), Qt.AlignHCenter | Qt.AlignTop, self.lyricM)
-		print textRectM.height()
 		
 		painter.setPen(QColor(self.readyColor));
 		painter.drawText(QRect(0, self.y + self.cheight, self.width(), textRectM.height() - self.cheight), Qt.AlignHCenter | Qt.AlignBottom, self.lyric)
