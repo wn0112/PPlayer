@@ -1,4 +1,4 @@
-<!DOCTYPE RCC>
+﻿<!DOCTYPE RCC>
 <RCC version="1.0">
 <qresource>
 <file alias="icons/about.png">icons/about.png</file>

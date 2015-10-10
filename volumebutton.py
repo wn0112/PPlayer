@@ -1,4 +1,4 @@
-from PyQt4 import QtGui, QtCore
+﻿from PyQt4 import QtGui, QtCore
 
 class VolumeButton(QtGui.QPushButton):
 	def __init__(self,parent = None):

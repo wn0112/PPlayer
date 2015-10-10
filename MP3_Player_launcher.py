@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from Ui_MP3_Player import *
@@ -90,6 +90,7 @@ class MainWindow(QMainWindow, QWidget):
 		iconOpen = QIcon(QPixmap(_fromUtf8(":/icons/folder.png")))
 		iconGlobal = QIcon(QPixmap(_fromUtf8(":/icons/global.png")))
 		iconSave = QIcon(QPixmap(_fromUtf8(":/icons/save.png")).copy(40, 0, 20, 20))
+		iconSettings = QIcon(QPixmap(_fromUtf8(":/icons/settings.png")).copy(0, 0, 20, 20))
 		iconAbout = QIcon(QPixmap(_fromUtf8(":/icons/about.png")))
 			
 		self.open = QAction('&Open', self)
@@ -100,6 +101,7 @@ class MainWindow(QMainWindow, QWidget):
 		self.settings = QAction('Settings...', self, triggered=self.settings)
 		self.about = QAction('&About', self, triggered=self.showAbout)		
 		self.save.setIcon(iconSave)			
+		self.settings.setIcon(iconSettings)			
 		self.open.setIcon(iconOpen)			
 		self.openURL.setIcon(iconGlobal)			
 		self.about.setIcon(iconAbout)			
@@ -120,7 +122,7 @@ class MainWindow(QMainWindow, QWidget):
 		iconQuit = QIcon(QPixmap(_fromUtf8(":/icons/quit.png")))									
 
 		self.restoreAction = QtGui.QAction("P&inus Player", self, triggered=self.showNormal)
-		self.settingsAction = QtGui.QAction("&Settings...", self, triggered=self.showNormal)
+		self.settingsAction = QtGui.QAction(iconSettings, "&Settings...", self, triggered=self.showNormal)
 		self.quitAction = QtGui.QAction(iconQuit, "&Quit", self, triggered=self.close)
 		self.shuffleAction = QtGui.QAction("&Shuffle", self, triggered=self.randomOn)		
 		self.repeat1Action = QtGui.QAction("Single &Cycle", self, triggered=self.singleRepeatOn)
