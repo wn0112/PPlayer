@@ -1466,7 +1466,7 @@ class MainWindow(QMainWindow, QWidget):
 			self.playingTab = 0
 			cf = ConfigParser.ConfigParser()
 			cf.read(_toUtf8(file).data())
-			self.path = cf.get('Player', 'path')
+			self.path = _fromUtf8(cf.get('Player', 'path'))
 			self.audioSink.setVolume(cf.getfloat('Player', 'volume'))
 			if cf.getboolean('Player', 'muted'):
 				self.muteClicked()	
@@ -1499,7 +1499,7 @@ class MainWindow(QMainWindow, QWidget):
 			reminder = QWidget()
 			reminder.setWindowIcon(QIcon(':/appicon.png'))
 			QMessageBox.warning(reminder,'Warning', 'Bad config file.', QMessageBox.Ok)
-			self.ui.emit(SIGNAL("loadCompleted()"))
+			self.emit(SIGNAL("loadCompleted()"))
 		
 	def isInTitle(self, xPos, yPos):
 		return yPos <= 25 and not (yPos <= 22 and (self.ui.closeBt.pos().x() + self.ui.closeBt.width() > xPos > self.ui.miniBt.pos().x()))
