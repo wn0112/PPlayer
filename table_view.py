@@ -16,7 +16,7 @@ class myTableView(QTableView):
 		iconSave = QIcon()
 		iconFavorite = QIcon()								
 		iconFolder = QIcon()								
-		iconDelete.addPixmap(QPixmap(_fromUtf8(":/icons/delete.png")).copy(40, 0, 20, 20), QIcon.Normal, QIcon.Off)
+		iconDelete.addPixmap(QPixmap(_fromUtf8(":/icons/delete_m.png")).copy(40, 0, 20, 20), QIcon.Normal, QIcon.Off)
 		iconSave.addPixmap(QPixmap(_fromUtf8(":/icons/save.png")).copy(40, 0, 20, 20), QIcon.Normal, QIcon.Off)
 		iconFavorite.addPixmap(QPixmap(_fromUtf8(":/icons/favorites_add.png")).copy(0, 0, 20, 20), QIcon.Normal, QIcon.Off)
 		iconFolder.addPixmap(QPixmap(_fromUtf8(":/icons/folder.png")).copy(0, 0, 20, 20), QIcon.Normal, QIcon.Off)
