@@ -92,7 +92,7 @@ class MainWindow(QMainWindow, QWidget):
 		iconOpen = QIcon(QPixmap(_fromUtf8(":/icons/folder.png")))
 		iconGlobal = QIcon(QPixmap(_fromUtf8(":/icons/global.png")))
 		iconSave = QIcon(QPixmap(_fromUtf8(":/icons/save.png")).copy(40, 0, 20, 20))
-		iconSettings = QIcon(QPixmap(_fromUtf8("./icons/settings.png")).copy(0, 0, 20, 20))
+		iconSettings = QIcon(QPixmap(_fromUtf8(":/icons/settings.png")).copy(0, 0, 20, 20))
 		iconAbout = QIcon(QPixmap(_fromUtf8(":/icons/about.png")))
 			
 		self.open = QAction('&Open', self)
