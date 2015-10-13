@@ -228,9 +228,8 @@ class openURL(about):
 		else:
 			lst = []
 			url = self.lineEdit.currentText()
-			file = QUrl(url)
-			r1 = QRegExp('^http(s)?://.*')
-			if file.isValid():				
+			file = QString(url)
+			if not file.isEmpty():				
 				self.parent().addMusicFromURL(file)
 				if not url in self.parent().history:
 					self.parent().history.append(url)
