@@ -11,7 +11,7 @@ Beautiful Music Player written in Python 2.7 and PyQt.
 
 ####Features:
 
-* Support mp3 and wma format audio file.
+* Support MP3 and WMA format audio file.
 
 * Search song.
 
