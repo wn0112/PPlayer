@@ -384,22 +384,10 @@ class MainWindow(QMainWindow, QWidget):
 			self.searchWidget.move(self.pos().x()+6, self.pos().y()+self.rect().height()-self.ui.operationFrame.height()-36)
 			self.searchWidget.show()
 		elif self.ui.search.isChecked() and self.searchWidget.lineEdit.text():
-			self.model.removeRows(0, self.model.rowCount())
-			length = len(self.allList)
-			for i in xrange(length):
-				lst = [QStandardItem(""), \
-						QStandardItem(self.allList[i].getTitle()), \
-						QStandardItem(self.allList[i].getTime()), \
-						QStandardItem(self.allList[i].getBitrate()), \
-						QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
-				self.model.appendRow(lst)
-				self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
-				if self.allList[i] in self.favList:
-					self.model.setItem(i, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
+			self.restoreTableAll()
 			self.searchWidget.lineEdit.rst()
 			self.ui.search.setChecked(False)
 			self.searchWidget.hide()		
-			self.setPos()
 		else:
 			self.ui.search.setChecked(False)
 			self.searchWidget.lineEdit.rst()
@@ -427,20 +415,7 @@ class MainWindow(QMainWindow, QWidget):
 						self.model.setItem(curIndex, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
 					
 		elif self.model.rowCount() != len(self.allList):
-			self.model.removeRows(0, self.model.rowCount())
-			for i in xrange(length):
-				lst = [QStandardItem(""), \
-						QStandardItem(self.allList[i].getTitle()), \
-						QStandardItem(self.allList[i].getTime()), \
-						QStandardItem(self.allList[i].getBitrate()), \
-						QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
-				self.model.appendRow(lst)
-				curIndex = self.model.rowCount()-1
-				self.model.item(curIndex, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
-
-				if self.allList[i] in self.favList:
-					self.model.setItem(curIndex, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
-			self.setPos()
+			self.restoreTableAll()
 			
 	def moveEvent(self, event):
 		self.emit(SIGNAL("parentMoved(QPoint)"), event.pos() - event.oldPos())
@@ -673,19 +648,7 @@ class MainWindow(QMainWindow, QWidget):
 					
 			# 
 			if len(selectedRows) > 1:
-				self.model.removeRows(0, self.model.rowCount())
-				length = len(self.allList)
-				for i in xrange(length):
-					lst = [QStandardItem(""), \
-							QStandardItem(self.allList[i].getTitle()), \
-							QStandardItem(self.allList[i].getTime()), \
-							QStandardItem(self.allList[i].getBitrate()), \
-							QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
-					self.model.appendRow(lst)
-					self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
-					if self.allList[i] in self.favList:
-						self.model.setItem(i, 4, QStandardItem(icon, "1"))
-				self.setPos()
+				self.restoreTableAll()
 			else:
 				self.model.setItem(index, 4, QStandardItem(icon, "1"))
 				
@@ -693,6 +656,23 @@ class MainWindow(QMainWindow, QWidget):
 			self.mediaObj.setCurrentSource(self.playList[0].getMediaSource())
 				
 		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
+
+	def restoreTableAll(self):
+		unfavIcon = QIcon(":/icons/unfavorite.png")
+		favIcon = QIcon(":/icons/favorite.png")
+		self.model.removeRows(0, self.model.rowCount())
+		length = len(self.allList)
+		for i in xrange(length):
+			lst = [QStandardItem(""), \
+					QStandardItem(self.allList[i].getTitle()), \
+					QStandardItem(self.allList[i].getTime()), \
+					QStandardItem(self.allList[i].getBitrate()), \
+					QStandardItem(unfavIcon, "0")]
+			self.model.appendRow(lst)
+			self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
+			if self.allList[i] in self.favList:
+				self.model.setItem(i, 4, QStandardItem(favIcon, "1"))
+		self.setPos()
 		
 	def removeFavorite(self, row=None):	
 		a = []
