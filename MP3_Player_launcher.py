@@ -73,7 +73,6 @@ class MainWindow(QMainWindow, QWidget):
 		self.searchWidget.resize(self.width()-12, 35)
 		self.logo = loading(self)
 		self.setWindowFlags(Qt.FramelessWindowHint)
-		sip.setdestroyonexit(False)
 		self.mediaObj = phonon.Phonon.MediaObject(self)
 		self.audioSink = phonon.Phonon.AudioOutput(phonon.Phonon.MusicCategory, self)
 		self.audioPath = phonon.Phonon.createPath(self.mediaObj, self.audioSink)
@@ -638,7 +637,23 @@ class MainWindow(QMainWindow, QWidget):
 				self.model_2.item(curIndex, 1).setForeground((QBrush(QColor(0, 0, 0))))
 				self.model_2.item(curIndex, 2).setForeground((QBrush(QColor(0, 0, 0))))
 				self.favList.append(row)
-				self.model.setItem(index, 4, QStandardItem(icon,'1'))
+				# self.model.setItem(index, 4, QStandardItem(icon,'1'))
+				
+			if len(selectedRows) > 1:
+				self.model.removeRows(0, self.model.rowCount())
+				length = len(self.matchID)
+				for i in xrange(length):
+					lst = [QStandardItem(""), \
+							QStandardItem(self.allList[int(self.matchID[i])].getTitle()), \
+							QStandardItem(self.allList[int(self.matchID[i])].getTime()), \
+							QStandardItem(self.allList[int(self.matchID[i])].getBitrate()), \
+							QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
+					self.model.appendRow(lst)
+					self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
+					if self.allList[int(self.matchID[i])] in self.favList:
+						self.model.setItem(i, 4, QStandardItem(icon, "1"))
+			else:
+				self.model.setItem(index, 4, QStandardItem(icon, "1"))
 		else:		
 			for i in selectedRows:
 				index = i.row()
@@ -674,8 +689,8 @@ class MainWindow(QMainWindow, QWidget):
 			else:
 				self.model.setItem(index, 4, QStandardItem(icon, "1"))
 				
-			if self.mediaObj.currentSource().type() == 4 and self.playingTab:
-				self.mediaObj.setCurrentSource(self.playList[0].getMediaSource())
+		if self.mediaObj.currentSource().type() == 4 and self.playingTab:
+			self.mediaObj.setCurrentSource(self.playList[0].getMediaSource())
 				
 		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
 		
@@ -1755,7 +1770,6 @@ class myThread(QtCore.QThread):
 			self.ui.emit(QtCore.SIGNAL("loadCompleted()"))
 		
 if __name__ == "__main__":
-    import sys
     app = MyApplication(sys.argv)
     MainWindow = MainWindow()
     sys.exit(app.exec_())
