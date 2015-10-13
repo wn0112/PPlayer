@@ -1,6 +1,7 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PyQt4.phonon import *
 from Ui_MP3_Player import *
 from searchWidget import *
 from lyric_ui import *
@@ -53,6 +54,7 @@ class MainWindow(QMainWindow, QWidget):
 		self.playList = self.allList
 		self.current = 0
 		self.offset = 0
+		self.history = []
 		self.playingTab = 0
 		self.fileType = ['mp3', 'wma']
 		self.file = QFileInfo()
@@ -90,7 +92,7 @@ class MainWindow(QMainWindow, QWidget):
 		iconOpen = QIcon(QPixmap(_fromUtf8(":/icons/folder.png")))
 		iconGlobal = QIcon(QPixmap(_fromUtf8(":/icons/global.png")))
 		iconSave = QIcon(QPixmap(_fromUtf8(":/icons/save.png")).copy(40, 0, 20, 20))
-		iconSettings = QIcon(QPixmap(_fromUtf8(":/icons/settings.png")).copy(0, 0, 20, 20))
+		iconSettings = QIcon(QPixmap(_fromUtf8("./icons/settings.png")).copy(0, 0, 20, 20))
 		iconAbout = QIcon(QPixmap(_fromUtf8(":/icons/about.png")))
 			
 		self.open = QAction('&Open', self)
@@ -101,9 +103,9 @@ class MainWindow(QMainWindow, QWidget):
 		self.settings = QAction('Settings...', self, triggered=self.settings)
 		self.about = QAction('&About', self, triggered=self.showAbout)		
 		self.save.setIcon(iconSave)			
-		self.settings.setIcon(iconSettings)			
 		self.open.setIcon(iconOpen)			
 		self.openURL.setIcon(iconGlobal)			
+		self.settings.setIcon(iconSettings)			
 		self.about.setIcon(iconAbout)			
 		
 		self.contextMenu.addAction(self.open)
@@ -118,7 +120,7 @@ class MainWindow(QMainWindow, QWidget):
 		
 		# -- menu end --
 
-		# -- system tray icon --						
+		# -- system tray icon --													
 		iconQuit = QIcon(QPixmap(_fromUtf8(":/icons/quit.png")))									
 
 		self.restoreAction = QtGui.QAction("P&inus Player", self, triggered=self.showNormal)
@@ -254,11 +256,11 @@ class MainWindow(QMainWindow, QWidget):
 		selectModel = self.ui.tableView.selectionModel()
 		selectedRows = selectModel.selectedRows()
 		if len(self.allList) == self.model.rowCount():
-			mediaObj = self.allList[selectedRows[0].row()]
+			afile = self.allList[selectedRows[0].row()]
 		else:
-			mediaObj = self.allList[int(self.matchID[selectedRows[0].row()])]
+			afile = self.allList[int(self.matchID[selectedRows[0].row()])]
 		
-		f = QFileInfo(mediaObj.fileName())
+		f = QFileInfo(afile.getFilePath())
 		try:
 			QProcess.startDetached("explorer.exe /select, " + f.filePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
 		except:
@@ -267,8 +269,8 @@ class MainWindow(QMainWindow, QWidget):
 	def openFolder_fav(self):
 		selectModel = self.ui.tableView_2.selectionModel()
 		selectedRows = selectModel.selectedRows()
-		mediaObj = self.favList[selectedRows[0].row()]
-		f = QFileInfo(mediaObj.fileName())
+		afile = self.favList[selectedRows[0].row()]
+		f = QFileInfo(afile.getFilePath())
 		try:
 			QProcess.startDetached("explorer.exe /select, " + f.filePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
 		except:
@@ -282,8 +284,7 @@ class MainWindow(QMainWindow, QWidget):
 		i = index.row()
 		if index.column() == 4:
 			if self.model.item(index.row(), index.column()).text() == '1':
-				if self.ui.search.isChecked() and (len(self.searchWidget.lineEdit.text()) 
-				and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150):
+				if self.model.rowCount() != len(self.allList):
 					indexOfFav = self.favList.index(self.allList[int(self.matchID[index.row()])])		
 					self.model.setItem(i, 4, QStandardItem(QIcon(":/icons/unfavorite.png"), "0"))					
 				else:
@@ -358,10 +359,6 @@ class MainWindow(QMainWindow, QWidget):
 			self.showNormal()
 			self.show()
 			self.activateWindow()
-				
-	def selectAllFile(self):
-		for i in xrange(self.model.rowCount()):
-			self.ui.tableView.selectRow(i)		
 	
 	def tabChanged(self):
 		self.emit(SIGNAL('mouseleavetable()'))
@@ -382,66 +379,19 @@ class MainWindow(QMainWindow, QWidget):
 		ab = about(self)	
 		ab.show()
 		
-	def textChanged(self, Qstr):
-		r1 = QRegExp('.*'+Qstr.toLower()+'.*')
-		length = len(self.playListDic)
-		if Qstr and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150:
-			self.model.removeRows(0, self.model.rowCount())
-			self.matchID = []			
-			for i in xrange(length):
-				if r1.exactMatch(self.playListDic[i][1].toLower()):
-					self.matchID.append(str(i))
-					lst = [QStandardItem(self.playListDic[i][0]), \
-							QStandardItem(self.playListDic[i][1]), \
-							QStandardItem(self.playListDic[i][2]), \
-							QStandardItem(self.playListDic[i][3]), \
-							QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
-					self.model.appendRow(lst)
-					curIndex = self.model.rowCount()-1
-					self.model.item(curIndex, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)					
-					if self.allList[i] in self.favList:
-						self.model.setItem(curIndex, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
-					
-		elif self.model.rowCount() != len(self.playList):
-			self.model.removeRows(0, self.model.rowCount())
-			for i in xrange(length):
-				lst = [QStandardItem(self.playListDic[i][0]), \
-						QStandardItem(self.playListDic[i][1]), \
-						QStandardItem(self.playListDic[i][2]), \
-						QStandardItem(self.playListDic[i][3]), \
-						QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
-				self.model.appendRow(lst)
-				curIndex = self.model.rowCount()-1
-				self.model.item(curIndex, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
-
-				if self.allList[i] in self.favList:
-					self.model.setItem(curIndex, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
-		
-	def moveEvent(self, event):
-		self.emit(SIGNAL("parentMoved(QPoint)"), event.pos() - event.oldPos())
-		self.emit(SIGNAL('mouseleavetable()'))
-
-	def resizeEvent(self, event):
-		self.emit(SIGNAL("parentResized(QSize)"), event.size() - event.oldSize())
-		self.emit(SIGNAL('mouseleavetable()'))
-		
 	def searchClicked(self):
 		if not self.ui.search.isChecked():
 			self.ui.search.setChecked(True)
 			self.searchWidget.move(self.pos().x()+6, self.pos().y()+self.rect().height()-self.ui.operationFrame.height()-36)
 			self.searchWidget.show()
-			self.playListDic = []
-			lenOfAll = self.model.rowCount()
-			for i in xrange(lenOfAll):
-				self.playListDic.append(['', self.model.item(i, 1).text(), self.model.item(i, 2).text(), self.model.item(i, 3).text()])
 		elif self.ui.search.isChecked() and self.searchWidget.lineEdit.text():
 			self.model.removeRows(0, self.model.rowCount())
-			length = len(self.playListDic)
+			length = len(self.allList)
 			for i in xrange(length):
-				lst = [QStandardItem(self.playListDic[i][0]), \
-						QStandardItem(self.playListDic[i][1]), \
-						QStandardItem(self.playListDic[i][2]), \
-						QStandardItem(self.playListDic[i][3]), \
+				lst = [QStandardItem(""), \
+						QStandardItem(self.allList[i].getTitle()), \
+						QStandardItem(self.allList[i].getTime()), \
+						QStandardItem(self.allList[i].getBitrate()), \
 						QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
 				self.model.appendRow(lst)
 				self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
@@ -456,6 +406,50 @@ class MainWindow(QMainWindow, QWidget):
 			self.searchWidget.lineEdit.rst()
 			self.searchWidget.hide()
 			self.setPos()
+		
+	def textChanged(self, Qstr):
+		r1 = QRegExp('.*'+Qstr.toLower()+'.*')
+		length = len(self.allList)
+		if Qstr and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150:
+			self.model.removeRows(0, self.model.rowCount())
+			self.matchID = []			
+			for i in xrange(length):
+				if r1.exactMatch(self.allList[i].getTitle().toLower()):
+					self.matchID.append(str(i))
+					lst = [QStandardItem(""), \
+							QStandardItem(self.allList[i].getTitle()), \
+							QStandardItem(self.allList[i].getTime()), \
+							QStandardItem(self.allList[i].getBitrate()), \
+							QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
+					self.model.appendRow(lst)
+					curIndex = self.model.rowCount()-1
+					self.model.item(curIndex, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)					
+					if self.allList[i] in self.favList:
+						self.model.setItem(curIndex, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
+					
+		elif self.model.rowCount() != len(self.allList):
+			self.model.removeRows(0, self.model.rowCount())
+			for i in xrange(length):
+				lst = [QStandardItem(""), \
+						QStandardItem(self.allList[i].getTitle()), \
+						QStandardItem(self.allList[i].getTime()), \
+						QStandardItem(self.allList[i].getBitrate()), \
+						QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
+				self.model.appendRow(lst)
+				curIndex = self.model.rowCount()-1
+				self.model.item(curIndex, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
+
+				if self.allList[i] in self.favList:
+					self.model.setItem(curIndex, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
+			self.setPos()
+			
+	def moveEvent(self, event):
+		self.emit(SIGNAL("parentMoved(QPoint)"), event.pos() - event.oldPos())
+		self.emit(SIGNAL('mouseleavetable()'))
+
+	def resizeEvent(self, event):
+		self.emit(SIGNAL("parentResized(QSize)"), event.size() - event.oldSize())
+		self.emit(SIGNAL('mouseleavetable()'))
 
 	def volumeChanged(self, q):
 		if q > 0.66:
@@ -491,27 +485,26 @@ class MainWindow(QMainWindow, QWidget):
 	def allMusicEntered(self, index):
 		title = self.model.item(index.row(), 1).text()
 		if len(self.allList) == self.model.rowCount():
-			path = self.allList[index.row()]
+			afile = self.allList[index.row()]
 		else:
-			path = self.allList[int(self.matchID[index.row()])]
+			afile = self.allList[int(self.matchID[index.row()])]
 	
-		if self.allList[index.row()].type() == 0:
-			QToolTip.showText(QCursor.pos(),  title + "\n" + path.fileName().replace("/", "\\"))
-		elif self.allList[index.row()].type() == 1:
-			QToolTip.showText(QCursor.pos(), title + "\n" + path.url().toString())
+		if self.allList[index.row()].getType() == 0:
+			QToolTip.showText(QCursor.pos(),  title + "\n" + afile.getFilePath().replace("/", "\\"))
+		elif self.allList[index.row()].getType() == 1:
+			QToolTip.showText(QCursor.pos(), title + "\n" + afile.getFilePath())
 		
 	def favoriteEntered(self, index):
-		if self.favList[index.row()].type() == 0:
-			QToolTip.showText(QCursor.pos(), self.model_2.item(index.row(), 1).text() + "\n" +self.favList[index.row()].fileName().replace("/", "\\"))
-		elif self.favList[index.row()].type() == 1:
-			QToolTip.showText(QCursor.pos(), self.model_2.item(index.row(), 1).text() + "\n" +self.favList[index.row()].url().toString())
+		if self.favList[index.row()].getType() == 0:
+			QToolTip.showText(QCursor.pos(), self.model_2.item(index.row(), 1).text() + "\n" +self.favList[index.row()].getFilePath().replace("/", "\\"))
+		elif self.favList[index.row()].getType() == 1:
+			QToolTip.showText(QCursor.pos(), self.model_2.item(index.row(), 1).text() + "\n" +self.favList[index.row()].getFilePath())
 			
 	def delete(self):
 		a = []
 		selectModel = self.ui.tableView.selectionModel()
 		selectedRows = selectModel.selectedRows()
-		if self.ui.search.isChecked() and (len(self.searchWidget.lineEdit.text()) 
-			and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150):
+		if self.model.rowCount() != len(self.allList):
 			a = [ int(self.matchID[i.row()]) for i in selectedRows ]
 		else:
 			a = [ i.row() for i in selectedRows ]
@@ -520,17 +513,15 @@ class MainWindow(QMainWindow, QWidget):
 		a.reverse()
 		
 		if self.mediaObj.currentSource().type() != 4:
-			curIndex = self.allList.index(self.mediaObj.currentSource())
+			curIndex = self.getCurrentIndex()
 		else:
 			curIndex = -1
 			
 		for i in a:
-			if self.ui.search.isChecked() and (len(self.searchWidget.lineEdit.text()) 
-				and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150):
+			if self.model.rowCount() != len(self.allList):
 				mindex = self.matchID.index(str(i))
 				self.model.removeRows(mindex, 1)
 				self.matchID.remove(str(i))
-				del self.playListDic[i]
 				
 				# update matchID list
 				for j in xrange(mindex, len(self.matchID)):
@@ -553,15 +544,15 @@ class MainWindow(QMainWindow, QWidget):
 			self.ui.playTime.setText("")
 			if len(self.allList):
 				if curIndex < len(self.allList):
-					self.mediaObj.setCurrentSource(self.allList[curIndex])
+					self.mediaObj.setCurrentSource(self.allList[curIndex].getMediaSource())
 				else:
 					lenOfAll = len(self.allList)
 					while(curIndex >= lenOfAll):
 						curIndex -= 1
-					self.mediaObj.setCurrentSource(self.allList[curIndex])
+					self.mediaObj.setCurrentSource(self.allList[curIndex].getMediaSource())
 			else:
 				self.mediaObj.clear()
-				self.current = 0				
+				self.current = -1				
 		elif self.playingTab and curIndex in a:	
 			self.stopPressed()
 			self.stopReleased()
@@ -569,14 +560,14 @@ class MainWindow(QMainWindow, QWidget):
 			self.ui.playTime.setText("")
 			if len(self.favList):
 				if curIndex < len(self.favList):
-					self.mediaObj.setCurrentSource(self.favList[curIndex])
+					self.mediaObj.setCurrentSource(self.favList[curIndex].getMediaSource())
 				else:
 					while(curIndex >= len(self.favList)):
 						curIndex -= 1
-					self.mediaObj.setCurrentSource(self.favList[curIndex])
+					self.mediaObj.setCurrentSource(self.favList[curIndex].getMediaSource())
 			else:
 				self.mediaObj.clear()
-				self.current = 0
+				self.current = -1
 				
 		if not len(self.allList) and not len(self.favList):
 			self.playingTab = 0
@@ -594,7 +585,7 @@ class MainWindow(QMainWindow, QWidget):
 			if self.ui.tabWidget.currentIndex():
 				selectModel = self.ui.tableView_2.selectionModel()
 				lst = self.favList
-			elif self.ui.search.isChecked() and (len(self.searchWidget.lineEdit.text()) and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150):			
+			elif self.model.rowCount() != len(self.allList):		
 				selectModel = self.ui.tableView.selectionModel()
 				lst = [ self.allList[int(i)] for i in self.matchID ]
 			else:
@@ -608,31 +599,30 @@ class MainWindow(QMainWindow, QWidget):
 					# a.append(i.row())
 				a.sort()
 				for song in a:
-					if lst[song].type() == 0:
-						self.file.setFile(lst[song].fileName())
+					if lst[song].getType() == 0:
+						self.file.setFile(lst[song].getFilePath())
 						playlist.write(u"#EXTINF:0,"+self.file.fileName().toUtf8().data().decode("utf-8")+u"\n")
 						playlist.write(self.file.filePath().replace(u"/", u"\\").toUtf8().data().decode('utf-8')+u'\n\n')
-					elif lst[song].type() == 1:
-						playlist.write(u"#EXTINF:0,"+lst[song].url().toString().replace(QRegExp(".*/"), u"").toUtf8().data().decode('utf-8')+u"\n")
-						playlist.write(lst[song].url().toString().toUtf8().data().decode('utf-8')+u'\n\n')
+					elif lst[song].getType() == 1:
+						playlist.write(u"#EXTINF:0,"+lst[song].getFilePath().replace(QRegExp(".*/"), u"").toUtf8().data().decode('utf-8')+u"\n")
+						playlist.write(lst[song].getFilePath().toUtf8().data().decode('utf-8')+u'\n\n')
 			else:
 				for song in lst:
-					if song.type() == 0:
-						self.file.setFile(song.fileName())			
+					if song.getType() == 0:
+						self.file.setFile(song.getFilePath())			
 						playlist.write(u"#EXTINF:0,"+self.file.fileName().toUtf8().data().decode("utf-8")+u"\n")
 						playlist.write(self.file.filePath().replace(u"/", u"\\").toUtf8().data().decode('utf-8')+u'\n\n')
-					elif song.type() == 1:
-						playlist.write(u"#EXTINF:0,"+song.url().toString().replace(QRegExp(".*/"), u"").toUtf8().data().decode('utf-8')+u"\n")
-						playlist.write(song.url().toString().toUtf8().data().decode('utf-8')+u'\n\n')
+					elif song.getType() == 1:
+						playlist.write(u"#EXTINF:0,"+song.getFilePath().replace(QRegExp(".*/"), u"").toUtf8().data().decode('utf-8')+u"\n")
+						playlist.write(song.getFilePath().toUtf8().data().decode('utf-8')+u'\n\n')
 			playlist.close()
 	
-	def addToFavorite(self, index=None):
+	def addToFavorite(self):
 		selectModel = self.ui.tableView.selectionModel()
 		selectedRows = selectModel.selectedRows()
 		self.ui.tableView.clearSelection()	
 		icon = QIcon(':/icons/favorite.png')
-		if self.ui.search.isChecked() \
-			and (len(self.searchWidget.lineEdit.text()) and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150):
+		if self.model.rowCount() != len(self.allList):
 			for i in selectedRows:
 				index = i.row()
 				row = self.allList[int(self.matchID[index])]
@@ -665,28 +655,28 @@ class MainWindow(QMainWindow, QWidget):
 				self.model_2.item(curIndex, 1).setForeground((QBrush(QColor(0, 0, 0))))
 				self.model_2.item(curIndex, 2).setForeground((QBrush(QColor(0, 0, 0))))
 				self.favList.append(self.allList[index])
-
-				# self.model.setItem(index, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
-				# self.model.item(index, 4).setText('1')
-			# 	
-			playListDic = []
-			lenOfAll = self.model.rowCount()
-			for i in xrange(lenOfAll):
-				playListDic.append(['', self.model.item(i, 1).text(), self.model.item(i, 2).text(), self.model.item(i, 3).text()])
-			self.model.removeRows(0, self.model.rowCount())
-			length = len(playListDic)
-			for i in xrange(length):
-				lst = [QStandardItem(playListDic[i][0]), \
-						QStandardItem(playListDic[i][1]), \
-						QStandardItem(playListDic[i][2]), \
-						QStandardItem(playListDic[i][3]), \
-						QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
-				self.model.appendRow(lst)
-				self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
-				if self.allList[i] in self.favList:
-					self.model.setItem(i, 4, QStandardItem(QIcon(":/icons/favorite.png"), "1"))
-			self.setPos()
-																
+					
+			# 
+			if len(selectedRows) > 1:
+				self.model.removeRows(0, self.model.rowCount())
+				length = len(self.allList)
+				for i in xrange(length):
+					lst = [QStandardItem(""), \
+							QStandardItem(self.allList[i].getTitle()), \
+							QStandardItem(self.allList[i].getTime()), \
+							QStandardItem(self.allList[i].getBitrate()), \
+							QStandardItem(QIcon(":/icons/unfavorite.png"), "0")]
+					self.model.appendRow(lst)
+					self.model.item(self.model.rowCount()-1, 2).setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
+					if self.allList[i] in self.favList:
+						self.model.setItem(i, 4, QStandardItem(icon, "1"))
+				self.setPos()
+			else:
+				self.model.setItem(index, 4, QStandardItem(icon, "1"))
+				
+			if self.mediaObj.currentSource().type() == 4 and self.playingTab:
+				self.mediaObj.setCurrentSource(self.playList[0].getMediaSource())
+				
 		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
 		
 	def removeFavorite(self, row=None):	
@@ -702,7 +692,7 @@ class MainWindow(QMainWindow, QWidget):
 
 		self.ui.tableView.clearSelection()			
 		if self.mediaObj.currentSource().type() != 4:
-			curIndex = self.playList.index(self.mediaObj.currentSource())
+			curIndex = self.getCurrentIndex()
 		else:
 			curIndex = -1
 			
@@ -719,14 +709,14 @@ class MainWindow(QMainWindow, QWidget):
 			self.ui.playTime.setText("")
 			if len(self.favList):
 				if curIndex < len(self.favList):
-					self.mediaObj.setCurrentSource(self.favList[curIndex])
+					self.mediaObj.setCurrentSource(self.favList[curIndex].getMediaSource())
 				else:
 					while(curIndex >= len(self.favList)):
 						curIndex -= 1
-					self.mediaObj.setCurrentSource(self.favList[curIndex])
+					self.mediaObj.setCurrentSource(self.favList[curIndex].getMediaSource())
 			else:
 				self.mediaObj.clear()
-				self.current = 0	
+				self.current = -1	
 			
 		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
 			
@@ -743,7 +733,7 @@ class MainWindow(QMainWindow, QWidget):
 			self.ui.play.setChecked(True)		
 			self.ui.stop.lbPressed()
 		
-		if not len(self.playList):
+		if not len(self.playList) or self.mediaObj.currentSource().type() == 4:
 			self.ui.play.setChecked(False)
 			return
 			
@@ -751,7 +741,7 @@ class MainWindow(QMainWindow, QWidget):
 			self.mediaObj.play()
 
 	def playReleased(self):
-		if not len(self.playList):
+		if not len(self.playList) or self.mediaObj.currentSource().type() == 4:
 			self.ui.play.rst()		
 			self.ui.previous.rbReleased()
 			self.ui.stop.lbReleased()
@@ -761,29 +751,35 @@ class MainWindow(QMainWindow, QWidget):
 		if self.mediaObj.currentSource().type() == 4:
 			return
 			
-		if (self.ui.search.isChecked() and (len(self.searchWidget.lineEdit.text()) 
-			and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150)):
+		if self.model.rowCount() != len(self.allList):
 			return
-		
-		curIndex = self.playList.index(self.mediaObj.currentSource())
+
+		curIndex = self.getCurrentIndex()
 		if not self.playingTab:
 			self.ui.tableView.clearSelection()	
 			self.model.setItem(curIndex, 0, QStandardItem(QIcon(QPixmap(":/icons/pos.png")), ""))
 			self.model.item(curIndex, 1).setForeground((QBrush(QColor(0, 0, 255))))
 			self.model.item(curIndex, 2).setForeground((QBrush(QColor(0, 0, 255))))
+			if self.isVisible():
+				self.ui.tableView.scrollTo(self.model.index(curIndex, 0))
 							
 		elif self.playingTab:
 			self.ui.tableView_2.clearSelection()	
 			self.model_2.setItem(curIndex, 0, QStandardItem(QIcon(QPixmap(":/icons/pos.png")), ""))
 			self.model_2.item(curIndex, 1).setForeground((QBrush(QColor(0, 0, 255))))
 			self.model_2.item(curIndex, 2).setForeground((QBrush(QColor(0, 0, 255))))
+			if self.isVisible():
+				self.ui.tableView_2.scrollTo(self.model_2.index(curIndex, 0))
 			
 	def removePos(self):
 		if self.playingTab and self.mediaObj.currentSource().type() == 4:
 			return
 		else:
-			curIndex = self.playList.index(self.mediaObj.currentSource())
-			
+			curIndex = self.getCurrentIndex()
+		
+		if self.model.rowCount() != len(self.allList):
+			return
+		
 		if self.playingTab:
 			self.ui.tableView.clearSelection()	
 			self.model_2.setItem(curIndex, 0, QStandardItem(""))
@@ -795,22 +791,16 @@ class MainWindow(QMainWindow, QWidget):
 			self.model.setItem(curIndex, 0, QStandardItem(""))
 			self.model.item(curIndex, 1).setForeground((QBrush(QColor(0, 0, 0))))
 			self.model.item(curIndex, 2).setForeground((QBrush(QColor(0, 0, 0))))
-			
-	def debug(self):
-		print "self.playingTab=", self.playingTab
-		print "len of playList", len(self.playList)
-		print "len of allList", len(self.allList)
-		print "len of favList", len(self.favList)
-			
+						
 	def doubleClicked(self, index):
 		self.ui.tableView.clearSelection()
-		if self.ui.search.isChecked() and (len(self.searchWidget.lineEdit.text()) and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150):
+		if self.model.rowCount() != len(self.allList):
 			i = index.row()
 			if self.playingTab:
 				self.removePos()
 			self.playList = self.allList
 			self.playingTab = 0
-			self.mediaObj.setCurrentSource(self.playList[int(self.matchID[i])])
+			self.mediaObj.setCurrentSource(self.playList[int(self.matchID[i])].getMediaSource())
 			self.searchClicked()
 			self.ui.search.status = 0
 			self.ui.search.update()
@@ -818,7 +808,7 @@ class MainWindow(QMainWindow, QWidget):
 			self.removePos()
 			self.playList = self.allList
 			self.playingTab = 0
-			self.mediaObj.setCurrentSource(self.playList[index.row()])
+			self.mediaObj.setCurrentSource(self.playList[index.row()].getMediaSource())
 			
 		self.resetSlider()
 		self.playPressed()	
@@ -830,7 +820,7 @@ class MainWindow(QMainWindow, QWidget):
 		self.playList = self.favList
 		self.ui.tableView_2.clearSelection()
 		self.playingTab = 1
-		self.mediaObj.setCurrentSource(self.playList[index.row()])
+		self.mediaObj.setCurrentSource(self.playList[index.row()].getMediaSource())
 		self.resetSlider()
 		self.playPressed()
 		self.emit(SIGNAL('listdoubleclicked(int)'), index.row())
@@ -838,7 +828,7 @@ class MainWindow(QMainWindow, QWidget):
 	def nextSong(self):
 		if self.playList:
 			self.resetSlider()
-			curIndex = self.playList.index(self.mediaObj.currentSource())
+			curIndex = self.getCurrentIndex()
 			if self.ui.repeat1.isChecked():
 				self.mediaObj.stop()			
 				self.mediaObj.play()			
@@ -848,9 +838,9 @@ class MainWindow(QMainWindow, QWidget):
 					num = curIndex
 					while(num == curIndex and len(self.playList) != 1):
 						num = random.randint(0, len(self.playList)-1)
-					self.mediaObj.setCurrentSource(self.playList[num])
+					self.mediaObj.setCurrentSource(self.playList[num].getMediaSource())
 				else:
-					self.mediaObj.setCurrentSource(self.playList[curIndex+1-len(self.playList)])
+					self.mediaObj.setCurrentSource(self.playList[curIndex+1-len(self.playList)].getMediaSource())
 				self.playPressed()
 			else:
 				self.mediaObj.stop()
@@ -882,7 +872,7 @@ class MainWindow(QMainWindow, QWidget):
 	def previousSong(self, invoke=None):
 		if self.playList:
 			self.resetSlider()		
-			curIndex = self.playList.index(self.mediaObj.currentSource())
+			curIndex = self.getCurrentIndex()
 			if self.ui.repeat1.isChecked():
 				self.mediaObj.stop()			
 				self.mediaObj.play()
@@ -892,9 +882,9 @@ class MainWindow(QMainWindow, QWidget):
 					num = curIndex
 					while(num == curIndex and len(self.playList) != 1):
 						num = random.randint(0, len(self.playList)-1)
-					self.mediaObj.setCurrentSource(self.playList[num])
+					self.mediaObj.setCurrentSource(self.playList[num].getMediaSource())
 				else:
-					self.mediaObj.setCurrentSource(self.playList[curIndex-1])
+					self.mediaObj.setCurrentSource(self.playList[curIndex-1].getMediaSource())
 				self.playPressed(1)
 			else:
 				self.mediaObj.stop()
@@ -1027,14 +1017,14 @@ class MainWindow(QMainWindow, QWidget):
 			self.movie.start()
 			
 			self.th1 = myThread(self, self.audioFiles, fav)
-			self.connect(self.th1, SIGNAL("appendrow(QStringList)"), self.appendRow)
+			self.connect(self.th1, SIGNAL("appendrow(PyQt_PyObject)"), self.appendRow)
 			self.connect(self.th1, SIGNAL("appendfav(int)"), self.appendFav)
 			# print QTime().currentTime()
 			self.th1.start()
 
 	def loadCompleted(self):
 		if self.mediaObj.currentSource().type() == 4 and self.model.rowCount():
-			self.mediaObj.setCurrentSource(self.playList[self.current])
+			self.mediaObj.setCurrentSource(self.playList[self.current].getMediaSource())
 				
 		self.ui.previous.setDisabled(False)
 		self.ui.play.setDisabled(False)
@@ -1046,50 +1036,15 @@ class MainWindow(QMainWindow, QWidget):
 		self.movie.stop()
 		# self.th1.quit()
 		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
-		# print QTime().currentTime()
 		
 	def addMusicFromURL(self, url):
-		if not url.isEmpty() and url.isValid():	
-			self.allList.append(phonon.Phonon.MediaSource(url))
-			lst = [QStandardItem(''), \
-					QStandardItem(url.toString().replace(QRegExp('.*/'), '')), \
-					QStandardItem(''), QStandardItem('')]
-			self.model.appendRow(lst)
+		newfile = AudioFile(url)
+		self.allList.append(newfile)
+		lst = [QStandardItem(''), \
+				QStandardItem(newfile.getFilePath().replace(QRegExp('.*/'), '')), \
+				QStandardItem(''), QStandardItem('')]
+		self.model.appendRow(lst)
 
-	def getTitle(self, file):
-		file = QFileInfo(file)
-		title = file.baseName()
-		if file.suffix().toLower() == 'mp3':
-			audio = MP3(unicode(file.filePath().toUtf8().data(), 'utf-8'))						
-			if audio.has_key('TIT2'):
-				s = audio.tags.get('TIT2').text[0].encode('raw_unicode_escape')
-				title = QString().fromUtf8(self.getStringCode(s))
-		elif file.suffix().toLower() == 'wma':
-			f = open(unicode(file.filePath().toUtf8(), 'utf-8'), 'rb')
-			audio = wma.WMADecoder(f)
-			if audio.title:
-				s = audio.title.encode('raw_unicode_escape')
-				title = QString().fromUtf8(self.getStringCode(s))
-			f.close()
-		return title
-			
-	def getStringCode(self, s):
-		global defaultcode
-		try:
-			code = chardet.detect(s)['encoding']			
-			if QString(s).toLower().contains('\\u'):
-				s = s.decode('raw_unicode_escape')
-			elif not code:
-				s = s.decode(defaultcode)
-			elif QString(code).toLower().contains('ascii'):
-				s = s.decode(code)
-			else:
-				s = s.decode(defaultcode)
-			return s
-		except:
-			s = s.decode('raw_unicode_escape')
-			return s
-	
 	def readM3U(self, file):
 		global defaultcode
 		df = open(file.toUtf8().data().decode('utf-8'), 'rb')
@@ -1107,9 +1062,9 @@ class MainWindow(QMainWindow, QWidget):
 			line = _fromUtf8(file.readLine().data().decode(code))
 			if (not r1.exactMatch(line) and not r2.exactMatch(line)):
 				if r3.exactMatch(line):
-					lst.append(phonon.Phonon.MediaSource(line.trimmed()))
+					lst.append(line.trimmed())
 				elif r4.exactMatch(line):
-					lst.append(phonon.Phonon.MediaSource(QUrl(line.trimmed())))
+					lst.append(line.trimmed())
 		file.close()
 		return lst
 
@@ -1161,13 +1116,14 @@ class MainWindow(QMainWindow, QWidget):
 	
 	def findLyric(self):
 		finded = QFileInfo()
+		curIndex = self.getCurrentIndex()
 		playingFile = QFileInfo(self.mediaObj.currentSource().fileName())
 		folder = QDir(playingFile.absolutePath())
 		folder.setNameFilters(QStringList(['*.lrc']))
 		for file in folder.entryInfoList():
 			lyc_name = file.baseName().toLower()
 			playing_name = playingFile.baseName().toLower()
-			title = self.getTitle(playingFile)
+			title = self.allList[curIndex].getTitleOnly()
 			if lyc_name.contains(playing_name) or lyc_name.contains(title.toLower()):
 				finded = file
 		return finded
@@ -1225,7 +1181,7 @@ class MainWindow(QMainWindow, QWidget):
 	def initialTable(self):
 		# -- All Music table --
 		self.model = QStandardItemModel()
-		self.model.setColumnCount(4)
+		self.model.setColumnCount(5)
 		self.model.setHorizontalHeaderItem(0, QStandardItem(""))
 		self.model.setHorizontalHeaderItem(1, QStandardItem("Name"))
 		self.model.setHorizontalHeaderItem(2, QStandardItem("Time"))
@@ -1263,7 +1219,7 @@ class MainWindow(QMainWindow, QWidget):
 
 		# -- My Favorite table --
 		self.model_2 = QStandardItemModel()
-		self.model_2.setColumnCount(4)
+		self.model_2.setColumnCount(5)
 		self.model_2.setHorizontalHeaderItem(0, QStandardItem(""))
 		self.model_2.setHorizontalHeaderItem(1, QStandardItem("Name"))
 		self.model_2.setHorizontalHeaderItem(2, QStandardItem("Time"))
@@ -1298,18 +1254,17 @@ class MainWindow(QMainWindow, QWidget):
 		self.ui.tableView_2.setAlternatingRowColors(True)
 							
 	def fileChanged(self):		
-		index = self.playList.index(self.mediaObj.currentSource())
+		index = self.getCurrentIndex()
+		self.current = index
 		if self.playingTab:
 			time = self.model_2.item(index, 2).text()
 			name = self.model_2.item(index, 1).text()
 			bitrate =  self.model_2.item(index, 3).text()
 		else:
-			if self.ui.search.isChecked() and (len(self.searchWidget.lineEdit.text()) 
-				and self.searchWidget.lineEdit.palette().color(QtGui.QPalette.Text).red() != 150):
-				
-				time = self.playListDic[index][2]
-				name = self.playListDic[index][1]			
-				bitrate = self.playListDic[index][3]
+			if self.model.rowCount() != len(self.allList):			
+				time = self.allList[index].getTime()
+				name = self.allList[index].getTitle()			
+				bitrate = self.allList[index].getBitrate()
 			else:
 				time = self.model.item(index, 2).text()	
 				name = self.model.item(index, 1).text()			
@@ -1342,8 +1297,8 @@ class MainWindow(QMainWindow, QWidget):
 				self.lyricExists = lrc.exists()
 				if self.lyricExists:					
 					self.lrc_lst, self.offset = self.readLyric(lrc.filePath())
-					curIndex = self.allList.index(self.mediaObj.currentSource())
-					self.lyric_ui.setText(self.model.item(curIndex, 1).text())
+					curIndex = self.getCurrentIndex()
+					self.lyric_ui.setText(self.playList[curIndex].getTitle())
 					lyc = QString()
 					for item in self.lrc_lst:
 						lyc.append(item[1]+'\n')
@@ -1366,18 +1321,31 @@ class MainWindow(QMainWindow, QWidget):
 				return
 			if not self.model_2.rowCount() and self.playingTab:
 				return
-				
+			
+			index = self.getCurrentIndex()	
 			msg = invalidFileMsg(self)
-			msg.setLabelText(self.mediaObj.currentSource().fileName().replace('/', '\\'))
-			index = self.allList.index(self.mediaObj.currentSource())
-			self.model.item(index, 0).setForeground((QBrush(QColor(255, 0, 0))))
-			self.model.item(index, 1).setForeground((QBrush(QColor(255, 0, 0))))
-			self.model.item(index, 2).setForeground((QBrush(QColor(255, 0, 0))))
-			if self.mediaObj.currentSource() in self.favList:
-				index = self.favList.index(self.mediaObj.currentSource())
+			if self.allList[index].getType() == 0:
+				msg.setLabelText(self.allList[index].getFilePath().replace('/', '\\'))
+			else:
+				msg.setLabelText(self.allList[index].getFilePath())
+				
+			if not self.playingTab:
+				self.model.item(index, 0).setForeground((QBrush(QColor(255, 0, 0))))
+				self.model.item(index, 1).setForeground((QBrush(QColor(255, 0, 0))))
+				self.model.item(index, 2).setForeground((QBrush(QColor(255, 0, 0))))
+				if self.allList[index] in self.favList:
+					indexFav = self.favList.index(self.allList[index])
+					self.model_2.item(indexFav, 0).setForeground((QBrush(QColor(255, 0, 0))))
+					self.model_2.item(indexFav, 1).setForeground((QBrush(QColor(255, 0, 0))))
+					self.model_2.item(indexFav, 2).setForeground((QBrush(QColor(255, 0, 0))))
+			else:
 				self.model_2.item(index, 0).setForeground((QBrush(QColor(255, 0, 0))))
 				self.model_2.item(index, 1).setForeground((QBrush(QColor(255, 0, 0))))
-				self.model_2.item(index, 2).setForeground((QBrush(QColor(255, 0, 0))))
+				self.model_2.item(index, 2).setForeground((QBrush(QColor(255, 0, 0))))				
+				indexAll = self.allList.index(self.favList[index])
+				self.model.item(indexAll, 0).setForeground((QBrush(QColor(255, 0, 0))))
+				self.model.item(indexAll, 1).setForeground((QBrush(QColor(255, 0, 0))))
+				self.model.item(indexAll, 2).setForeground((QBrush(QColor(255, 0, 0))))
 			self.showNormal()
 			self.show()
 			msg.show()
@@ -1441,7 +1409,7 @@ class MainWindow(QMainWindow, QWidget):
 		cf.set('Player', 'repeat1', self.ui.repeat1.isChecked())
 		cf.set('Player', 'repeat', self.ui.repeat.isChecked())
 		if self.mediaObj.currentSource().type() != 4:
-			cf.set('Player', 'pos', '['+str(self.playingTab)+','+str(self.playList.index(self.mediaObj.currentSource()))+']')
+			cf.set('Player', 'pos', '['+str(self.playingTab)+','+str(self.getCurrentIndex())+']')
 		favlst = []
 		favlst = [self.allList.index(i) for i in self.favList]
 	
@@ -1454,10 +1422,7 @@ class MainWindow(QMainWindow, QWidget):
 		if len(self.allList) != 0:
 			list = []
 			for song in self.allList:
-				if song.type() == 0:
-					list.append(_toUtf8(song.fileName()).data())
-				elif song.type() == 1:
-					list.append(_toUtf8(song.url().toString()).data())
+				list.append(_toUtf8(song.getFilePath()).data())
 			cf.set('Latest_list', 'list', list)
 			
 		cf.write(cfg)
@@ -1544,12 +1509,12 @@ class MainWindow(QMainWindow, QWidget):
 	def dropEvent(self, event):
 		self.emit(SIGNAL("addMusic(QStringList)"), self.dragFilesList)		
 
-	def appendRow(self, qlst):
-		self.allList.append(phonon.Phonon.MediaSource(qlst[3]))
+	def appendRow(self, obj):
+		self.allList.append(obj)
 		row = [QStandardItem(""), \
-				QStandardItem(qlst[0]), \
-				QStandardItem(qlst[1]), \
-				QStandardItem(qlst[2]), \
+				QStandardItem(self.allList[-1].getTitle()), \
+				QStandardItem(self.allList[-1].getTime()), \
+				QStandardItem(self.allList[-1].getBitrate()), \
 				QStandardItem(QIcon(":/icons/unfavorite.png"),"0")]
 		self.model.appendRow(row)
 		curIndex = self.model.rowCount()-1
@@ -1586,7 +1551,130 @@ class MainWindow(QMainWindow, QWidget):
 				self.addToPlayList()				
 			elif event.key() == Qt.Key_O:
 				self.addMusic()
+
+	def getCurrentIndex(self):
+		src = self.mediaObj.currentSource()
+		if src.type() == 4:
+			return -1
+		for i in xrange(len(self.playList)):
+			if self.playList[i].src == src:
+				return i
+		return -1
 				
+				
+class AudioFile(object):
+	def __init__(self, fileName):
+		self.file = QFileInfo(fileName)
+		self.title = QString()
+		self.artist = QString()
+		self.time = QString()
+		self.bitrate = QString()
+		self.isFavorite = False
+		self.src = None
+		self.audioInfo(self.file)
+		
+	def isFavorited(self):
+		return self.isFavorite
+		
+	def setFavorite(self, bool):
+		self.isFavorite = bool
+	
+	def suffix(self):
+		return self.file.suffix().toLower()
+
+	def getTitle(self):
+		if self.artist:
+			return self.title + ' - ' + self.artist
+		else:
+			return self.title
+
+	def getTitleOnly(self):
+		return self.title
+		
+	def getArtist(self):
+		return self.artist
+		
+	def getTime(self):
+		return self.time
+		
+	def getBitrate(self):
+		return self.bitrate
+		
+	def getFileName(self):
+		return self.file.fileName()
+	
+	def getFilePath(self):
+		return self.file.filePath()
+		
+	def getBaseName(self):
+		return self.file.baseName()
+
+	def getType(self):	
+		return self.getMediaSource().type()
+		
+	def getMediaSource(self):
+		if self.src:
+			return  self.src
+		else:
+			self.src = Phonon.MediaSource(self.file.filePath())
+			return self.src
+		
+	def getStringCode(self, s):
+		global defaultcode
+		try:
+			code = chardet.detect(s)['encoding']			
+			if QString(s).toLower().contains('\\u'):
+				s = s.decode('raw_unicode_escape')
+			elif not code:
+				s = s.decode(defaultcode)
+			elif QString(code).toLower().contains('ascii'):
+				s = s.decode(code)
+			else:
+				s = s.decode(defaultcode)
+			return s
+		except:
+			s = s.decode('raw_unicode_escape')
+			return s
+	
+	def audioInfo(self, file):
+		title = self.getBaseName()
+		artist = QString()
+		time = QString()
+		bitrate = QString()
+		
+		if self.getType() == 1:
+			self.title = file.fileName()		
+			return
+			
+		suffix = self.suffix()
+		if suffix == 'mp3':
+			audio = MP3(unicode(file.filePath().toUtf8().data(), 'utf-8'))						
+			if audio.has_key('TIT2'):
+				s = audio.tags.get('TIT2').text[0].encode('raw_unicode_escape')
+				title = QString().fromUtf8(self.getStringCode(s))
+			if audio.has_key('TPE1'):
+				s = audio.tags.get('TPE1').text[0].encode('raw_unicode_escape')								
+				artist = QString().fromUtf8(self.getStringCode(s))
+			if audio.info.length:
+				time = QTime().addSecs(audio.info.length).toString("mm:ss")
+			if audio.info.bitrate:
+				bitrate = QString(str(audio.info.bitrate/1000)+'kbps')
+		elif suffix == 'wma':
+			f = open(unicode(file.filePath().toUtf8(), 'utf-8'), 'rb')
+			audio = wma.WMADecoder(f)
+			if audio.title:
+				s = audio.title.encode('raw_unicode_escape')
+				title = QString().fromUtf8(self.getStringCode(s))
+			if audio.artist:
+				s = audio.artist.encode('raw_unicode_escape')
+				artist = QString().fromUtf8(self.getStringCode(s))		
+			if audio.duration:
+				time = QTime().addSecs(audio.duration).toString("mm:ss")
+			if audio.bitrate:
+				bitrate = QString(str(audio.bitrate)+'kbps')
+			f.close()
+		self.title, self.artist, self.time, self.bitrate = title, artist, time, bitrate
+						
 class MyApplication(QApplication):
 	
 	def __init__(self, args):
@@ -1630,7 +1718,6 @@ class MyApplication(QApplication):
 		return False, 0		
 		
 class myThread(QtCore.QThread):
-
 	def __init__(self, ui, fileList, favList=None):
 		QtCore.QThread.__init__(self)
 		self.ui = ui
@@ -1644,28 +1731,19 @@ class myThread(QtCore.QThread):
 			self.ui.path = self.file.absolutePath()	
 			lenOfAudio = QString(str(len(self.audioFiles)))
 			if self.file.suffix().toLower() in self.ui.fileType:
-				i = 0
-				for string in self.audioFiles:
-					title, time, bitrate = self.audioInfo(string)								
-					self.emit(SIGNAL("appendrow(QStringList)"), QStringList() << title << time << bitrate << string)		
+				for i in xrange(len(self.audioFiles)):
+					newfile = AudioFile(self.audioFiles[i])				
+					self.emit(SIGNAL("appendrow(PyQt_PyObject)"), newfile)		
 					self.ui.emit(SIGNAL("progress(QString)"), QString(str(i+1))+ "/" +lenOfAudio)
-					i+=1
+
 			elif self.file.suffix().toLower() == "m3u":
 				for m in self.audioFiles:
 					lst = self.ui.readM3U(m)
 					lenOfLst = QString(str(len(lst)))
-					# self.ui.allList.extend(lst) 
-					i = 0
-					for src in lst:
-						if src.type() == 1:
-							title = src.url().toString().replace(QRegExp(".*/"), "")
-							time = ''
-							bitrate = ''
-						elif src.type() == 0:
-							title, time, bitrate = self.audioInfo(src.fileName())
-						self.emit(SIGNAL("appendrow(QStringList)"), QStringList() << title << time << bitrate << src.fileName())	
+					for i in xrange(len(lst)):
+						newfile = AudioFile(lst[i])
+						self.emit(SIGNAL("appendrow(PyQt_PyObject)"), newfile)	
 						self.ui.emit(SIGNAL("progress(QString)"), QString(str(i+1))+ "/" +lenOfLst)						
-						i+=1
 			if self.favlst:
 				for i in self.favlst:
 					self.emit(SIGNAL("appendfav(int)"), i)
@@ -1675,133 +1753,6 @@ class myThread(QtCore.QThread):
 		except Exception,e:
 			self.ui.emit(QtCore.SIGNAL("err(QString)"), _fromUtf8(e.message.capitalize()))
 			self.ui.emit(QtCore.SIGNAL("loadCompleted()"))
-	
-	def audioInfo(self, file):
-		file = QFileInfo(file)
-		title = file.baseName()
-		time = ''
-		bitrate = ''
-		suffix = file.suffix().toLower()
-		if suffix == 'mp3':
-			audio = MP3(unicode(file.filePath().toUtf8().data(), 'utf-8'))						
-			if audio.has_key('TIT2'):
-				s = audio.tags.get('TIT2').text[0].encode('raw_unicode_escape')
-				title = QString().fromUtf8(self.getStringCode(s))
-			if audio.has_key('TPE1'):
-				s = audio.tags.get('TPE1').text[0].encode('raw_unicode_escape')								
-				title = title +' - '+ QString().fromUtf8(self.getStringCode(s))
-			if audio.info.length:
-				time = QTime().addSecs(audio.info.length).toString("mm:ss")
-			if audio.info.bitrate:
-				bitrate = QString(str(audio.info.bitrate/1000)+'kbps')
-		elif suffix == 'wma':
-			f = open(unicode(file.filePath().toUtf8(), 'utf-8'), 'rb')
-			audio = wma.WMADecoder(f)
-			if audio.title:
-				s = audio.title.encode('raw_unicode_escape')
-				title = QString().fromUtf8(self.getStringCode(s))
-			if audio.artist:
-				s = audio.artist.encode('raw_unicode_escape')
-				title = title +' - '+QString().fromUtf8(self.getStringCode(s))		
-			if audio.duration:
-				time = QTime().addSecs(audio.duration).toString("mm:ss")
-			if audio.bitrate:
-				bitrate = QString(str(audio.bitrate)+'kbps')
-			f.close()
-		return title, time, bitrate
-		
-	def getStringCode(self, s):
-		global defaultcode
-		try:
-			code = chardet.detect(s)['encoding']			
-			if QString(s).toLower().contains('\\u'):
-				s = s.decode('raw_unicode_escape')
-			elif not code:
-				s = s.decode(defaultcode)
-			elif QString(code).toLower().contains('ascii'):
-				s = s.decode(code)
-			else:
-				s = s.decode(defaultcode)
-			return s
-		except:
-			s = s.decode('raw_unicode_escape')
-			return s
-
-class longNameDelegate(QStyledItemDelegate):
-	def __init__(self, parent=None):
-		super(longNameDelegate, self).__init__(parent)
-				
-	def createEditor(self, parent, option, index):
-		model = index.model()
-		self.editor = checkbox(parent)
-		self.editor.connect(self.editor, SIGNAL('clicked()'), self.changeBg)
-		return self.editor
-
-	def setEditorData(self, editor, index):
-		if index.data().toString().toLower() == 'false':
-			editor.setChecked(False)
-		else:
-			editor.setChecked(True)
-		
-	def setModelData(self, editor, model, index):
-		value = editor.isChecked()		
-		if value:
-			icon = QIcon(":/icons/favorite.png")
-		else:
-			icon = QIcon(":/icons/unfavorite.png")
-		model.setData(index, value, Qt.DisplayRole)
-		model.setData(index, icon, Qt.DecorationRole)
-
-	def updateEditorGeometry(self, editor, option, index):
-		newRect = option.rect
-		newRect.setX(newRect.x() + 3)
-		newRect.setY(newRect.y() + 0)		
-		newRect.setWidth(newRect.width() + 3)		
-		editor.setGeometry(newRect)
-			
-	def changeBg(self):
-		try:
-			self.commitData.emit(self.editor)
-			self.closeEditor.emit(self.editor, 0)
-		except:
-			pass
-		
-class nullDelegate(QStyledItemDelegate):
-	def __init__(self, parent=None):
-		super(nullDelegate, self).__init__(parent)
-
-	def createEditor(self, parent, option, index):
-		pass
-
-	def setEditorData(self, editor, index):
-		pass
-		
-	def setModelData(self, editor, model, index):
-		pass
-	
-class checkbox(QFrame):
-	def __init__(self, parent=None):
-		super(checkbox, self).__init__(parent)
-		self.cbox = QCheckBox(self)
-		self.cbox.setObjectName(_fromUtf8('fav'))
-		self.cbox.setProperty("cursor", QCursor(Qt.PointingHandCursor))
-		self.horizontalLayout = QHBoxLayout(self)
-		self.horizontalLayout.setMargin(0)
-		self.horizontalLayout.addWidget(self.cbox, Qt.AlignCenter)		
-		QObject.connect(self.cbox, QtCore.SIGNAL('clicked()'), self.statechange)
-	
-	def setChecked(self, bool):
-		self.cbox.setChecked(bool)
-
-	def isChecked(self):
-		return self.cbox.isChecked()
-		
-	def statechange(self):
-		self.parent().parent().emit(QtCore.SIGNAL('favchanged(bool, QModelIndex&)'), self.cbox.isChecked(), self.parent().parent().indexAt(self.pos()))
-
-	def closeEvent(self, event):
-		del self.cbox
-		event.accept()
 		
 if __name__ == "__main__":
     import sys
