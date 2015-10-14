@@ -8,7 +8,7 @@ from lyric_ui import *
 from about import *
 from logo import *
 from mutagen.mp3 import MP3
-from hsaudiotag import wma
+from mutagen.asf import ASF
 from progressslider import *
 import sip, sys, random, ConfigParser, images, re, chardet, locale, codecs
 
@@ -47,7 +47,7 @@ class MainWindow(QMainWindow, QWidget):
 
 	def __init__(self, parent=None):
 		self.border = 4
-		self.path = QString('D:/Music/')
+		self.path = QString()
 		self.playList = []
 		self.allList = []
 		self.favList = []
@@ -64,20 +64,18 @@ class MainWindow(QMainWindow, QWidget):
 		QMainWindow.__init__(self, parent)
 		sip.setdestroyonexit(False)
 		self.setObjectName(_fromUtf8("mainwindow"))
-		
 		self.ui = Ui_MainWindow()
-		self.ui.setupUi(self)
-		self.searchWidget = float_ui(self)
+		self.ui.setupUi(self)		
 		self.lyric_ui = lyric_ui()
 		self.lyric_ui_scroll = lyric_ui_scroll()
-		self.searchWidget.resize(self.width()-12, 35)
+		
 		self.logo = loading(self)
 		self.setWindowFlags(Qt.FramelessWindowHint)
 		self.mediaObj = phonon.Phonon.MediaObject(self)
 		self.audioSink = phonon.Phonon.AudioOutput(phonon.Phonon.MusicCategory, self)
 		self.audioPath = phonon.Phonon.createPath(self.mediaObj, self.audioSink)
 		self.ui.volumeSlider.setAudioOutput(self.audioSink)
-		self.mediaObj.setTickInterval(1000)
+		self.mediaObj.setTickInterval(10)
 		self.audioSink.setVolume(0.8)
 		self.setAcceptDrops(True)
 		self.qss = QtCore.QFile(':/qss/qss.qss')
@@ -235,8 +233,7 @@ class MainWindow(QMainWindow, QWidget):
 		self.connect(self.ui.tableView, SIGNAL("addToFavorite()"), self.addToFavorite)
 		self.connect(self.ui.tableView, SIGNAL("openFolder()"), self.openFolder_all)
 		self.connect(self.ui.tableView_2, SIGNAL("openFolder()"), self.openFolder_fav)
-		self.connect(self, SIGNAL("autoSave(QString)"), self.exportIni)
-		self.connect(self.searchWidget.lineEdit, SIGNAL("textChanged(QString)"), self.textChanged)		
+		self.connect(self, SIGNAL("autoSave(QString)"), self.exportIni)	
 		self.connect(self.logo, SIGNAL("loadingclosed()"), self.close)
 		self.connect(self, SIGNAL("loadCompleted()"), self.loadCompleted)
 		self.connect(self.ui.singleLine, SIGNAL('triggered()'), self.showSingleLineLyric)
@@ -291,7 +288,8 @@ class MainWindow(QMainWindow, QWidget):
 				self.removeFavorite(indexOfFav)
 			else:
 				self.addToFavorite()
-			self.ui.tableView.setCurrentIndex(self.model.index(i, 0))			
+			# self.ui.tableView.setCurrentIndex(self.model.index(i, 0))			
+			self.ui.tableView.clearSelection()			
 						
 	def clickStarFav(self, index):
 		if index.column() == 4:
@@ -321,9 +319,9 @@ class MainWindow(QMainWindow, QWidget):
 	def pressed(self, index):
 		self.emit(SIGNAL('listdoubleclicked(int)'), index.row())
 			
-	def sliderMoved(self, int):
-		self.mediaObj.seek(int)
-			
+	def sliderMoved(self, time):
+		self.mediaObj.seek(time)
+					
 	def singleLyrichide(self):
 		self.ui.singleLine.setChecked(False)
 		
@@ -380,18 +378,21 @@ class MainWindow(QMainWindow, QWidget):
 		
 	def searchClicked(self):
 		if not self.ui.search.isChecked():
-			self.ui.search.setChecked(True)
+			self.ui.search.setChecked(True)	
+			self.searchWidget = float_ui(self)
+			self.connect(self.searchWidget.lineEdit, SIGNAL("textChanged(QString)"), self.textChanged)	
+			self.searchWidget.resize(self.width()-12, 35)			
 			self.searchWidget.move(self.pos().x()+6, self.pos().y()+self.rect().height()-self.ui.operationFrame.height()-36)
 			self.searchWidget.show()
 		elif self.ui.search.isChecked() and self.searchWidget.lineEdit.text():
 			self.restoreTableAll()
-			self.searchWidget.lineEdit.rst()
+			# self.searchWidget.lineEdit.rst()
 			self.ui.search.setChecked(False)
-			self.searchWidget.hide()		
+			self.searchWidget.deleteLater()		
 		else:
 			self.ui.search.setChecked(False)
-			self.searchWidget.lineEdit.rst()
-			self.searchWidget.hide()
+			# self.searchWidget.lineEdit.rst()
+			self.searchWidget.deleteLater()
 			self.setPos()
 		
 	def textChanged(self, Qstr):
@@ -1071,7 +1072,7 @@ class MainWindow(QMainWindow, QWidget):
 
 		lrc = QFile(name)
 		lrc.open(QFile.ReadOnly)
-		r1 = re.compile("(\[\d{2}:\d{2}(.\d+)?\])")
+		r1 = re.compile("\[(\d{2}:\d{2}(.\d+)?)\]")
 		r2 = re.compile("\[\d+:+.+\](.*)")
 		r3 = re.compile("\[offset:(-?\d+)\]")
 		item = []
@@ -1555,8 +1556,7 @@ class MainWindow(QMainWindow, QWidget):
 			if self.playList[i].src == src:
 				return i
 		return -1
-				
-				
+								
 class AudioFile(object):
 	def __init__(self, fileName):
 		self.file = QFileInfo(fileName)
@@ -1655,19 +1655,17 @@ class AudioFile(object):
 			if audio.info.bitrate:
 				bitrate = QString(str(audio.info.bitrate/1000)+'kbps')
 		elif suffix == 'wma':
-			f = open(unicode(file.filePath().toUtf8(), 'utf-8'), 'rb')
-			audio = wma.WMADecoder(f)
-			if audio.title:
-				s = audio.title.encode('raw_unicode_escape')
+			audio = ASF(unicode(file.filePath().toUtf8().data(), 'utf-8'))
+			if audio.has_key('Title'):
+				s = audio.tags.get('Title')[0].value.encode('raw_unicode_escape')
 				title = QString().fromUtf8(self.getStringCode(s))
-			if audio.artist:
-				s = audio.artist.encode('raw_unicode_escape')
+			if audio.has_key('Author'):
+				s = audio.tags.get('Author')[0].value.encode('raw_unicode_escape')
 				artist = QString().fromUtf8(self.getStringCode(s))		
-			if audio.duration:
-				time = QTime().addSecs(audio.duration).toString("mm:ss")
-			if audio.bitrate:
-				bitrate = QString(str(audio.bitrate)+'kbps')
-			f.close()
+			if audio.info.length:
+				time = QTime().addSecs(audio.info.length).toString("mm:ss")
+			if audio.info.bitrate:
+				bitrate = QString(str(audio.info.bitrate/1000)+'kbps')
 		self.title, self.artist, self.time, self.bitrate = title, artist, time, bitrate
 						
 class MyApplication(QApplication):
