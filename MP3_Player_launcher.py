@@ -7,8 +7,8 @@ from searchWidget import *
 from lyric_ui import *
 from about import *
 from logo import *
-from mutagen.mp3 import MP3
-from mutagen.asf import ASF
+from mutagen.mp3 import MP3		# mutagen v1.24
+from mutagen.asf import ASF		# mutagen v1.24
 from progressslider import *
 import sip, sys, random, ConfigParser, images, re, chardet, locale, codecs
 
@@ -1644,10 +1644,10 @@ class AudioFile(object):
 		suffix = self.suffix()
 		if suffix == 'mp3':
 			audio = MP3(unicode(file.filePath().toUtf8().data(), 'utf-8'))						
-			if audio.has_key('TIT2'):
+			if 'TIT2' in audio.keys():
 				s = audio.tags.get('TIT2').text[0].encode('raw_unicode_escape')
 				title = QString().fromUtf8(self.getStringCode(s))
-			if audio.has_key('TPE1'):
+			if 'TPE1' in audio.keys():
 				s = audio.tags.get('TPE1').text[0].encode('raw_unicode_escape')								
 				artist = QString().fromUtf8(self.getStringCode(s))
 			if audio.info.length:
@@ -1656,11 +1656,11 @@ class AudioFile(object):
 				bitrate = QString(str(audio.info.bitrate/1000)+'kbps')
 		elif suffix == 'wma':
 			audio = ASF(unicode(file.filePath().toUtf8().data(), 'utf-8'))
-			if audio.has_key('Title'):
-				s = audio.tags.get('Title')[0].value.encode('raw_unicode_escape')
+			if 'Title' in audio.keys():
+				s = audio.tags.get('Title')[0].encode('raw_unicode_escape')
 				title = QString().fromUtf8(self.getStringCode(s))
-			if audio.has_key('Author'):
-				s = audio.tags.get('Author')[0].value.encode('raw_unicode_escape')
+			if 'Author' in audio.keys():
+				s = audio.tags.get('Author')[0].encode('raw_unicode_escape')
 				artist = QString().fromUtf8(self.getStringCode(s))		
 			if audio.info.length:
 				time = QTime().addSecs(audio.info.length).toString("mm:ss")
