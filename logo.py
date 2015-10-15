@@ -88,7 +88,7 @@ class loading(QtGui.QDialog):
 		self.verticalLayout.addWidget(self.label_3)
 		self.verticalLayout.addWidget(self.label_2)
 		self.label_3.setText("--/--")
-		self.movie = QtGui.QMovie(QtCore.QString(':/icons/logo.gif'), QtCore.QByteArray())
+		self.movie = QtGui.QMovie(QtCore.QString(':/icons/logo.GIF'), QtCore.QByteArray())
 		self.movie.setCacheMode(QtGui.QMovie.CacheAll)
 		self.movie.setSpeed(100)
 		self.label_2.setMovie(self.movie)
