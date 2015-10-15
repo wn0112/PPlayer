@@ -386,12 +386,10 @@ class MainWindow(QMainWindow, QWidget):
 			self.searchWidget.show()
 		elif self.ui.search.isChecked() and self.searchWidget.lineEdit.text():
 			self.restoreTableAll()
-			# self.searchWidget.lineEdit.rst()
 			self.ui.search.setChecked(False)
 			self.searchWidget.deleteLater()		
 		else:
 			self.ui.search.setChecked(False)
-			# self.searchWidget.lineEdit.rst()
 			self.searchWidget.deleteLater()
 			self.setPos()
 		
@@ -570,8 +568,6 @@ class MainWindow(QMainWindow, QWidget):
 			if len(selectedRows):
 				a = []
 				a = [ i.row() for i in selectedRows ]
-				# for i in selectedRows:
-					# a.append(i.row())
 				a.sort()
 				for song in a:
 					if lst[song].getType() == 0:
