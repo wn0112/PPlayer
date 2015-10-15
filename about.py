@@ -1,6 +1,6 @@
 ﻿from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-from push_button import *
+from mybuttons import *
 import images
 
 

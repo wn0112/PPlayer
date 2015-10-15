@@ -9,7 +9,7 @@
 
 from PyQt4 import QtCore, QtGui
 import images
-from push_button import *
+from mybuttons import *
 
 try:
 	_fromUtf8 = QtCore.QString.fromUtf8

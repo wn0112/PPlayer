@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-from push_button import *
+from mybuttons import *
 import images, time, locale
 
 try:
