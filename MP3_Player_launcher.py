@@ -68,7 +68,7 @@ class MainWindow(QMainWindow, QWidget):
 		self.ui.setupUi(self)		
 		self.lyric_ui = lyric_ui()
 		self.lyric_ui_scroll = lyric_ui_scroll()
-		
+		self.searchWidget = float_ui(self)
 		self.logo = loading(self)
 		self.setWindowFlags(Qt.FramelessWindowHint)
 		self.mediaObj = phonon.Phonon.MediaObject(self)
@@ -234,6 +234,7 @@ class MainWindow(QMainWindow, QWidget):
 		self.connect(self.ui.tableView, SIGNAL("openFolder()"), self.openFolder_all)
 		self.connect(self.ui.tableView_2, SIGNAL("openFolder()"), self.openFolder_fav)
 		self.connect(self, SIGNAL("autoSave(QString)"), self.exportIni)	
+		self.connect(self.searchWidget.lineEdit, SIGNAL("textChanged(QString)"), self.textChanged)
 		self.connect(self.logo, SIGNAL("loadingclosed()"), self.close)
 		self.connect(self, SIGNAL("loadCompleted()"), self.loadCompleted)
 		self.connect(self.ui.singleLine, SIGNAL('triggered()'), self.showSingleLineLyric)
@@ -380,18 +381,18 @@ class MainWindow(QMainWindow, QWidget):
 	def searchClicked(self):
 		if not self.ui.search.isChecked():
 			self.ui.search.setChecked(True)	
-			self.searchWidget = float_ui(self)
-			self.connect(self.searchWidget.lineEdit, SIGNAL("textChanged(QString)"), self.textChanged)	
 			self.searchWidget.resize(self.width()-12, 35)			
 			self.searchWidget.move(self.pos().x()+6, self.pos().y()+self.rect().height()-self.ui.operationFrame.height()-36)
 			self.searchWidget.show()
 		elif self.ui.search.isChecked() and self.searchWidget.lineEdit.text():
 			self.restoreTableAll()
 			self.ui.search.setChecked(False)
-			self.searchWidget.deleteLater()		
+			self.searchWidget.lineEdit.rst()
+			self.searchWidget.hide()		
 		else:
 			self.ui.search.setChecked(False)
-			self.searchWidget.deleteLater()
+			self.searchWidget.lineEdit.rst()
+			self.searchWidget.hide()
 			self.setPos()
 		
 	def textChanged(self, Qstr):
