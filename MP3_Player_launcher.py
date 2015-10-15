@@ -273,6 +273,7 @@ class MainWindow(QMainWindow, QWidget):
 			QProcess.startDetached("explorer.exe " + f.absolutePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
 		
 	def hideMainWindow(self):
+		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
 		self.showMinimized()
 		self.hide()
 		
@@ -652,7 +653,7 @@ class MainWindow(QMainWindow, QWidget):
 		if self.mediaObj.currentSource().type() == 4 and self.playingTab:
 			self.mediaObj.setCurrentSource(self.playList[0].getMediaSource())
 				
-		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
+		
 
 	def restoreTableAll(self):
 		unfavIcon = QIcon(":/icons/unfavorite.png")
@@ -710,7 +711,7 @@ class MainWindow(QMainWindow, QWidget):
 				self.mediaObj.clear()
 				self.current = -1	
 			
-		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
+		#self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
 			
 	def menuPlayPressed(self):
 		if self.playmbt.text() == "Play":
