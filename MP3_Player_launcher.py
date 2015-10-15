@@ -354,7 +354,7 @@ class MainWindow(QMainWindow, QWidget):
 		self.repeatAction.setChecked(self.ui.repeat.isChecked())
 		self.previousmbt.setDisabled(self.mediaObj.state() != 2)
 		self.nextmbt.setDisabled(self.mediaObj.state() != 2)
-		if reason == QtGui.QSystemTrayIcon.Trigger and self.isHidden() and self.movie.state() == 0:
+		if reason == QtGui.QSystemTrayIcon.Trigger and (self.isHidden() or self.isMinimized() or not self.isActiveWindow()) and self.movie.state() == 0:
 			self.showNormal()
 			self.show()
 			self.activateWindow()
