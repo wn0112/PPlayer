@@ -3,6 +3,7 @@
 Beautiful Music Player written in Python 2.7 and PyQt.
 
 ####Platform
+* Python 2.7 + PyQt4
 * Windows 7
 
 ####How to run
