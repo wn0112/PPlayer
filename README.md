@@ -25,6 +25,8 @@ Beautiful Music Player written in Python 2.7 and PyQt.
 * Save/Open m3u file.
 
 * Tray icon, tray menu.
+####TODO:
+* Audio Spectrum show.
 
 ####Screenshot
 ![Screenshot](https://github.com/wn0112/PPlayer/blob/master/screenshot.png)
