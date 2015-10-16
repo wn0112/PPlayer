@@ -12,11 +12,11 @@ Beautiful Music Player written in Python 2.7 and PyQt.
 
 ####Features:
 
-* Support MP3 and WMA format audio file.
+* It supports MP3 and WMA format audio file.
 
 * Search song.
 
-* Lyric show: Single line or multiple lines.
+* Lyric show - Single line or multiple lines.
 
 * Add to favorite.
 
