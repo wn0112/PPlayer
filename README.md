@@ -27,6 +27,7 @@ Beautiful Music Player written in Python 2.7 and PyQt.
 * Tray icon, tray menu.
 ####TODO:
 * Audio Spectrum show.
+* Settings.
 
 ####Screenshot
 ![Screenshot](https://github.com/wn0112/PPlayer/blob/master/screenshot.png)
