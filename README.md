@@ -4,7 +4,7 @@ Beautiful Music Player written in Python 2.7 and PyQt.
 
 ####Platform
 * Python 2.7 + PyQt4
-* Windows 7
+* Windows 7 x86/x64, CHS/EN
 
 ####How to run
 * <a href="https://github.com/wn0112/PPlayer/blob/master/MP3_Player_launcher.py">MP3_Player_launcher.py</a> &nbsp;  <b><<< Launcher file.</b>
