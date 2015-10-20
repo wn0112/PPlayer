@@ -89,6 +89,7 @@ class MainWindow(QMainWindow, QWidget):
 		iconOpen = QIcon(QPixmap(_fromUtf8(":/icons/folder.png")))
 		iconGlobal = QIcon(QPixmap(_fromUtf8(":/icons/global.png")))
 		iconSave = QIcon(QPixmap(_fromUtf8(":/icons/save.png")).copy(40, 0, 20, 20))
+		iconMute = QIcon(QPixmap(_fromUtf8(":/icons/sound.png")))
 		iconSettings = QIcon(QPixmap(_fromUtf8(":/icons/settings.png")).copy(0, 0, 20, 20))
 		iconAbout = QIcon(QPixmap(_fromUtf8(":/icons/about.png")))
 			
@@ -121,6 +122,7 @@ class MainWindow(QMainWindow, QWidget):
 		iconQuit = QIcon(QPixmap(_fromUtf8(":/icons/quit.png")))									
 
 		self.restoreAction = QtGui.QAction("P&inus Player", self, triggered=self.showNormal)
+		self.muteAction = QtGui.QAction(iconMute, "Mute", self, triggered=self.muteClicked)
 		self.settingsAction = QtGui.QAction(iconSettings, "&Settings...", self, triggered=self.showNormal)
 		self.quitAction = QtGui.QAction(iconQuit, "&Quit", self, triggered=self.close)
 		self.shuffleAction = QtGui.QAction("&Shuffle", self, triggered=self.randomOn)		
@@ -129,6 +131,7 @@ class MainWindow(QMainWindow, QWidget):
 		self.shuffleAction.setCheckable(True)
 		self.repeat1Action.setCheckable(True)
 		self.repeatAction.setCheckable(True)
+		self.muteAction.setCheckable(True)
 			
 		self.trayIconMenu = QtGui.QMenu(self)
 		# self.trayIconMenu.setObjectName(_fromUtf8("traymenu"))
@@ -177,6 +180,7 @@ class MainWindow(QMainWindow, QWidget):
 		self.playMode.addAction(self.repeat1Action)
 		self.playMode.addAction(self.repeatAction)
 		self.trayIconMenu.addAction(self.playMode.menuAction())
+		self.trayIconMenu.addAction(self.muteAction)
 		self.trayIconMenu.addSeparator()
 		self.trayIconMenu.addAction(self.settingsAction)
 		self.trayIconMenu.addSeparator()
@@ -273,10 +277,10 @@ class MainWindow(QMainWindow, QWidget):
 		except:
 			QProcess.startDetached("explorer.exe " + f.absolutePath().replace("/", "\\").toUtf8().data().decode('utf-8'))
 		
-	def hideMainWindow(self):
-		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
+	def hideMainWindow(self):		
 		self.showMinimized()
 		self.hide()
+		self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
 		
 	def clickStarAll(self, index):
 		i = index.row()
@@ -348,7 +352,6 @@ class MainWindow(QMainWindow, QWidget):
 			self.playmbt.update()		
 			self.playmbt.setText("Play")
 			self.playmbt.setToolTip("Play")
-
 		self.shuffleAction.setChecked(self.ui.shuffle.isChecked())
 		self.repeat1Action.setChecked(self.ui.repeat1.isChecked())
 		self.repeatAction.setChecked(self.ui.repeat.isChecked())
@@ -427,17 +430,15 @@ class MainWindow(QMainWindow, QWidget):
 		self.emit(SIGNAL('mouseleavetable()'))
 
 	def volumeChanged(self, q):
+		self.audioSink.setMuted(False)
+		self.ui.volume.setChecked(False)
+		self.muteAction.setChecked(False)
+		self.muteAction.setIcon(QIcon(QPixmap(_fromUtf8(":/icons/sound.png"))))
 		if q > 0.66:
-			self.audioSink.setMuted(False)
-			self.ui.volume.setChecked(False)
 			self.volumePixmap = self.volumeIcon.copy(0, 60, 80, 20)
 		elif 0.66 >= q > 0.33:
-			self.audioSink.setMuted(False)
-			self.ui.volume.setChecked(False)
 			self.volumePixmap = self.volumeIcon.copy(0, 40, 80, 20)		
 		elif 0 < q <= 0.33:
-			self.audioSink.setMuted(False)
-			self.ui.volume.setChecked(False)
 			self.volumePixmap = self.volumeIcon.copy(0, 20, 80, 20)
 		elif q == 0:
 			self.muteClicked()
@@ -448,10 +449,14 @@ class MainWindow(QMainWindow, QWidget):
 		if not self.ui.volume.isChecked():
 			self.ui.volume.setChecked(True)
 			self.audioSink.setMuted(True)
+			self.muteAction.setChecked(True)
+			self.muteAction.setIcon(QIcon(QPixmap(_fromUtf8(":/icons/sound_down.png"))))
 			self.volumePixmap = self.volumeIcon.copy(0, 0, 80, 20)
 		else:
 			self.ui.volume.setChecked(False)
 			self.audioSink.setMuted(False)
+			self.muteAction.setChecked(False)
+			self.muteAction.setIcon(QIcon(QPixmap(_fromUtf8(":/icons/sound.png"))))
 			self.volumeChanged(self.audioSink.volume())
 
 		self.ui.volume.loadPixmap(self.volumePixmap)
