@@ -14,13 +14,13 @@ Beautiful Music Player written in Python 2.7 and PyQt.
 
 * It supports MP3 and WMA format audio file.
 
-* Search song.
+* Search by keywords.
 
-* Lyric show - Single line or multiple lines.
+* Lyric show - Single line or Multiple lines.
 
 * Add to favorite.
 
-* Play mode - single cycle, repeat all, shuffle.
+* Play mode - Single Cycle/Repeat All/Shuffle.
 
 * Save/Open m3u file.
 
