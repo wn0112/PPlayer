@@ -1,4 +1,4 @@
-﻿<!DOCTYPE RCC>
+<!DOCTYPE RCC>
 <RCC version="1.0">
 <qresource>
 <file alias="icons/about.png">icons/about.png</file>
@@ -9,6 +9,7 @@
 <file alias="icons/checked.png">icons/checked.png</file>
 <file alias="icons/close.png">icons/close.png</file>
 <file alias="icons/delete.png">icons/delete.png</file>
+<file alias="icons/delete_m.png">icons/delete_m.png</file>
 <file alias="icons/dot-16.png">icons/dot-16.png</file>
 <file alias="icons/down-hover.png">icons/down-hover.png</file>
 <file alias="icons/down.png">icons/down.png</file>
@@ -40,6 +41,9 @@
 <file alias="icons/save.png">icons/save.png</file>
 <file alias="icons/search.png">icons/search.png</file>
 <file alias="icons/search24.png">icons/search24.png</file>
+<file alias="icons/settings.png">icons/settings.png</file>
+<file alias="icons/sound.png">icons/sound.png</file>
+<file alias="icons/sound_down.png">icons/sound_down.png</file>
 <file alias="icons/stop.png">icons/stop.png</file>
 <file alias="icons/unchecked.png">icons/unchecked.png</file>
 <file alias="icons/unfavorite.png">icons/unfavorite.png</file>
