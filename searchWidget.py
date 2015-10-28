@@ -50,9 +50,9 @@ class float_ui(QtGui.QDialog):
 		self.label.setMinimumSize(QtCore.QSize(25, 25))
 		self.label.setMaximumSize(QtCore.QSize(22, 25))
 		self.label.setStyleSheet(_fromUtf8("background-color: white;"
-											"border:2px solid gray;"
-											"border-top-left-radius:10px;"
-											"border-bottom-left-radius:10px;"
+											"border:1px solid gray;"
+											"border-top-left-radius:7px;"
+											"border-bottom-left-radius:7px;"
 											"padding:2px 2px;"
 											"border-right: none; "
 											"border-color:#BDCCDC;"))
@@ -67,7 +67,7 @@ class float_ui(QtGui.QDialog):
 		self.label.setFocus()
 		self.lineEdit.setStyleSheet(_fromUtf8("QLineEdit {"
 												"background-color: white;"
-												"border:2px solid gray;"
+												"border:1px solid gray;"
 												"padding:2px 4px; "
 												"border-left: none;"
 												"border-right: none;"
@@ -80,15 +80,16 @@ class float_ui(QtGui.QDialog):
 		self.label_2.setMinimumSize(QtCore.QSize(25, 25))
 		self.label_2.setMaximumSize(QtCore.QSize(25, 25))
 		self.label_2.setStyleSheet(_fromUtf8("background-color: white;"
-												"border:2px solid gray;"
-												"border-top-right-radius:10px;"
-												"border-bottom-right-radius:10px;"
+												"border:1px solid gray;"
+												"border-top-right-radius:7px;"
+												"border-bottom-right-radius:7px;"
 												"padding:2px 2px;"
 												"border-color:#BDCCDC;"
 												"border-left:none;"
 												"color: silver;"))
 		self.label_2.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignBottom)
 		self.label_2.setObjectName(_fromUtf8("label_2"))
+		self.label_2.setContentsMargins(0, 0, 0, 4)
 		self.label_2.setFont(QtGui.QFont("verdana, thoma", 8))
 		self.horizontalLayout_5.addWidget(self.label_2)
 		self.verticalLayout.addWidget(self.frame_2)
@@ -104,7 +105,6 @@ class float_ui(QtGui.QDialog):
 		
 	def retranslateUi(self):
 		self.setWindowTitle(_translate("Dialog", "Dialog", None))
-		self.lineEdit.setText(_translate("Dialog", "Type keywords to search...", None))
 		self.label_2.setText(_translate("Dialog", "", None))
 	
 	def newPos(self, p):
@@ -133,7 +133,8 @@ class myLabel(QtGui.QLabel):
 		
 class myLineEdit(QtGui.QLineEdit):
 	def __init__(self, parent=None):
-		super(myLineEdit, self).__init__(parent)		
+		super(myLineEdit, self).__init__(parent)	
+		self.tips = QtCore.QString("Type keywords to search...")	
 		self.font = QtGui.QFont("verdana, thoma", 8)
 		self.font.setItalic(True)
 		self.setFont(self.font)
@@ -141,6 +142,11 @@ class myLineEdit(QtGui.QLineEdit):
 		self.color.setColor(QtGui.QPalette.Text, QtGui.QColor(150, 150, 150, 255))
 		self.setPalette(self.color)
 		self.setFocusPolicy(QtCore.Qt.ClickFocus)
+		self.setText(_translate("Dialog", self.tips, None))
+		
+	def setTips(self, s):
+		self.tips = s
+		self.setText(_translate("Dialog", self.tips, None))
 		
 	def focusInEvent(self, event):
 		if self.palette().color(QtGui.QPalette.Text).red() == 150:
@@ -157,7 +163,7 @@ class myLineEdit(QtGui.QLineEdit):
 			self.font.setItalic(True)
 			self.setPalette(self.color)
 			self.setFont(self.font)
-			self.setText(_translate("Dialog", "Type keywords to search...", None))
+			self.setText(_translate("Dialog", self.tips, None))
 			self.parent().setFocus()
 			self.emit(QtCore.SIGNAL("losefocus()"))
 			
@@ -166,6 +172,6 @@ class myLineEdit(QtGui.QLineEdit):
 		self.font.setItalic(True)
 		self.setPalette(self.color)
 		self.setFont(self.font)
-		self.setText(_translate("Dialog", "Type keywords to search...", None))
+		self.setText(_translate("Dialog", self.tips, None))
 		self.parent().setFocus()
 		self.emit(QtCore.SIGNAL("losefocus()"))

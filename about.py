@@ -1,6 +1,7 @@
 ﻿from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from mybuttons import *
+from xml.etree import ElementTree as ET
 import images
 
 
@@ -153,8 +154,29 @@ class openURL(about):
 		super(openURL, self).__init__(parent)
 
 	def setupUI(self):
+		try:
+			if QtCore.QFile('./lang/'+self.parent().currentLang.toUtf8().data()+'.xml').exists():
+				self.doc = ET.parse('./lang/'+self.parent().currentLang.toUtf8().data()+'.xml')
+				title = _fromUtf8(self.doc.findall("./Message/OpenURLTitle")[0].text)
+				okBt = self.doc.findall("./Message/Button/OK")[0].text
+				cancelBt = self.doc.findall("./Message/Button/Cancel")[0].text
+				browseBt = self.doc.findall("./Message/Button/Browse")[0].text
+				urlInfo = self.doc.findall("./Message/URLInfo")[0].text
+			else:
+				title = QString("Open URL")
+				okBt = QString("OK")
+				cancelBt = QString("Cancel")
+				browseBt = QString("Browse...")
+				urlInfo = QString("Enter the URL or path to a media file on the Internet, your computer, or your network that you want to play.")
+		except:
+			title = QString("Open URL")
+			okBt = QString("OK")
+			cancelBt = QString("Cancel")
+			browseBt = QString("Browse...")
+			urlInfo = QString("Enter the URL or path to a media file on the Internet, your computer, or your network that you want to play.")
+			
 		self.setTitleIcon(":/icons/appicon.png")
-		self.setTitle("Open URL")
+		self.setTitle(title)
 		self.resize(400, 140)
 		self.contentVerticalLayout = QtGui.QVBoxLayout(self.contentFrame)
 		self.contentVerticalLayout.setObjectName(_fromUtf8("contentVerticalLayout"))
@@ -205,17 +227,16 @@ class openURL(about):
 		self.browse.setFixedSize(75, 23)
 		self.btHorizontalLayout.addWidget(self.browse)
 		self.contentVerticalLayout.addWidget(self.btFrame)
-		self.retranslateUi()
+					
+		self.label.setText(_translate("Dialog",urlInfo, None))
+		self.ok.setText(_translate("Dialog", okBt, None))
+		self.cancel.setText(_translate("Dialog", cancelBt, None))
+		self.browse.setText(_translate("Dialog", browseBt, None))
 		
 		self.connect(self.cancel, SIGNAL("clicked()"), self.close)		
 		self.connect(self.browse, SIGNAL("clicked()"), self.clickBrowse)		
 		self.connect(self.ok, SIGNAL("clicked()"), self.clickOK)		
 
-	def retranslateUi(self):
-		self.label.setText(_translate("Dialog", "Enter the URL or path to a media file on the Internet, your computer, or your network that you want to play.", None))
-		self.ok.setText(_translate("Dialog", "OK", None))
-		self.cancel.setText(_translate("Dialog", "Cancel", None))
-		self.browse.setText(_translate("Dialog", "Browse...", None))
 
 	def clickBrowse(self):
 		self.close()
@@ -243,8 +264,23 @@ class promptMsg(about):
 		super(promptMsg, self).__init__(parent)
 		
 	def setupUI(self):
+		try:
+			if QtCore.QFile('./lang/'+self.parent().parent().currentLang.toUtf8().data()+'.xml').exists():
+				self.doc = ET.parse('./lang/'+self.parent().parent().currentLang.toUtf8().data()+'.xml')  
+				title = _fromUtf8(self.doc.findall("./Message/PromMsgTitle")[0].text)
+				info = _fromUtf8(self.doc.findall("./Message/InvalidURL")[0].text)
+				okBt = _fromUtf8(self.doc.findall("./Message/Button/OK")[0].text)
+			else:
+				title = QString("Error")
+				info = QString("Not a valid URL.")
+				okBt = QString("OK")
+		except:
+			title = QString("Error")
+			info = QString("Not a valid URL.")
+			okBt = QString("OK")
+			
 		self.setTitleIcon(":/icons/appicon.png")
-		self.setTitle("Error")
+		self.setTitle(title)
 		self.contentVerticalLayout = QtGui.QVBoxLayout(self.contentFrame)
 		self.contentVerticalLayout.setObjectName(_fromUtf8("contentVerticalLayout"))
 		self.contentVerticalLayout.setContentsMargins(10, 10, 10, 10)
@@ -252,11 +288,12 @@ class promptMsg(about):
 		self.label = QtGui.QLabel(self.contentFrame)
 		self.label.setObjectName(_fromUtf8("label"))		
 		self.label.setWordWrap(True)
-		self.contentVerticalLayout.addWidget(self.label)		
-		self.label.setText("Not a valid URL.")
+		self.contentVerticalLayout.addWidget(self.label)
+		
+		self.label.setText(info)
 		self.ok = QPushButton(self)
 		self.ok.setObjectName(_fromUtf8("ok"))
-		self.ok.setText("OK")
+		self.ok.setText(okBt)
 		self.ok.setStyleSheet("QPushButton{border:1px solid lightgray;background:transparent}}"
 			"QPushButton:hover{border-color:#A9A9A9;background:transparent}"
 			"QPushButton:hover:pressed{border:1px solid lightgray;background:rgb(230,230,230)")
@@ -270,15 +307,30 @@ class invalidFileMsg(about):
 		super(invalidFileMsg, self).__init__(parent)
 		
 	def setupUI(self):
+		try:
+			if QtCore.QFile('./lang/'+self.parent().currentLang.toUtf8().data()+'.xml').exists():
+				self.doc = ET.parse('./lang/'+self.parent().currentLang.toUtf8().data()+'.xml')  
+				title = _fromUtf8(self.doc.findall("./Message/InvalidFileTitle")[0].text)
+				info = _fromUtf8(self.doc.findall("./Message/InvalidFileMsg")[0].text)
+				okBt = _fromUtf8(self.doc.findall("./Message/Button/OK")[0].text)
+			else:
+				title = QString("Unrecognized files")
+				info = QString("Failed to play following files:")
+				okBt = QString("OK")
+		except:
+			title = QString("Unrecognized files")
+			info = QString("Failed to play following files:")
+			okBt = QString("OK")
+			
 		self.setTitleIcon(":/icons/appicon.png")
-		self.setTitle("Unrecognized files")
+		self.setTitle(title)
 		self.contentVerticalLayout = QtGui.QVBoxLayout(self.contentFrame)
 		self.contentVerticalLayout.setObjectName(_fromUtf8("contentVerticalLayout"))
 		self.contentVerticalLayout.setContentsMargins(10, 10, 10, 10)
 		self.contentVerticalLayout.setSpacing(10)
 		self.label = QtGui.QLabel(self.contentFrame)
 		self.label.setObjectName(_fromUtf8("label"))		
-		self.label.setText("Failed to play following files:")
+		self.label.setText(info)
 		self.label.setStyleSheet("font-weight: bold;")
 		spacerItem = QtGui.QSpacerItem(20, 100, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
 		self.contentVerticalLayout.addWidget(self.label, 0, Qt.AlignTop)	
@@ -289,7 +341,7 @@ class invalidFileMsg(about):
 		self.contentVerticalLayout.addWidget(self.filesname)		
 		self.ok = QPushButton(self)
 		self.ok.setObjectName(_fromUtf8("ok"))
-		self.ok.setText("OK")
+		self.ok.setText(okBt)
 		self.ok.setStyleSheet("QPushButton{border:1px solid lightgray;background:transparent}}"
 			"QPushButton:hover{border-color:#A9A9A9;background:transparent}"
 			"QPushButton:hover:pressed{border:1px solid lightgray;background:rgb(230,230,230)")
@@ -300,3 +352,34 @@ class invalidFileMsg(about):
 	
 	def setLabelText(self, s):
 		self.filesname.setText(s)
+
+class failToApplyLangMsg(about):
+	def __init__(self, parent=None):
+		super(failToApplyLangMsg, self).__init__(parent)
+		
+	def setupUI(self):
+		title = QString("Error")
+		info = QString("Fail to apply language file.")
+		okBt = QString("OK")			
+		self.setTitleIcon(":/icons/appicon.png")
+		self.setTitle(title)
+		self.contentVerticalLayout = QtGui.QVBoxLayout(self.contentFrame)
+		self.contentVerticalLayout.setObjectName(_fromUtf8("contentVerticalLayout"))
+		self.contentVerticalLayout.setContentsMargins(10, 10, 10, 10)
+		self.contentVerticalLayout.setSpacing(10)
+		self.label = QtGui.QLabel(self.contentFrame)
+		self.label.setObjectName(_fromUtf8("label"))		
+		self.label.setWordWrap(True)
+		self.contentVerticalLayout.addWidget(self.label)
+		
+		self.label.setText(info)
+		self.ok = QPushButton(self)
+		self.ok.setObjectName(_fromUtf8("ok"))
+		self.ok.setText(okBt)
+		self.ok.setStyleSheet("QPushButton{border:1px solid lightgray;background:transparent}}"
+								"QPushButton:hover{border-color:#A9A9A9;background:transparent}"
+								"QPushButton:hover:pressed{border:1px solid lightgray;background:rgb(230,230,230)")
+		self.ok.setFixedSize(75, 23)
+		self.contentVerticalLayout.addWidget(self.ok, 0, Qt.AlignRight)	
+			
+		self.connect(self.ok, SIGNAL("clicked()"), self.close)

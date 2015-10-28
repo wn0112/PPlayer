@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.phonon import *
@@ -11,7 +11,7 @@ from mutagen.mp3 import MP3		# mutagen v1.30: https://bitbucket.org/lazka/mutage
 from mutagen.asf import ASF		# mutagen v1.30
 from progressslider import *
 import sip, sys, random, ConfigParser, images, re, chardet, locale, codecs
-
+from xml.etree import ElementTree as ET
 defaultcode = 'utf-8'
 
 c = QString(locale.getdefaultlocale()[0]).toLower()
@@ -59,7 +59,13 @@ class MainWindow(QMainWindow, QWidget):
 		self.fileType = ['mp3', 'wma']
 		self.file = QFileInfo()
 		self.lyricExists = False
-	
+		self.currentLang = QString('en_us')
+		self.en_us = {'zh_cn':'Simplified Chinese', 'zh_tw':'Traditional Chinese', 'en_us':'English', 'kr':'Korea', 'jp':'Japanese'}
+		self.zh_cn = {'zh_cn':'简体中文', 'zh_tw':'繁体中文', 'en_us':'英语', 'kr':'韩语', 'jp':'日语'}
+		self.zh_tw = {'zh_cn':'簡體中文', 'zh_tw':'繁體中文', 'en_us':'英語', 'kr':'韓語', 'jp':'日語'}
+		self.kr = {'zh_cn':'중국어 간체', 'zh_tw':'중국어 번체', 'en_us':'영어', 'kr':'한국어', 'jp':'일본어'}
+		self.jp = {'zh_cn':'簡体字中国語', 'zh_tw':'繁体字中国語', 'en_us':'英語', 'kr':'韓国語', 'jp':'日本語'}
+		
 		
 		QMainWindow.__init__(self, parent)
 		sip.setdestroyonexit(False)
@@ -99,16 +105,35 @@ class MainWindow(QMainWindow, QWidget):
 		self.save = QAction('&Save as playlist...', self, triggered=self.addToPlayList)
 		self.save.setShortcut(_translate("MainWindow", "Ctrl+S", None))
 		self.settings = QAction('Settings...', self, triggered=self.settings)
+		self.language = QMenu('Language', self)
 		self.about = QAction('&About', self, triggered=self.showAbout)		
 		self.save.setIcon(iconSave)			
 		self.open.setIcon(iconOpen)			
 		self.openURL.setIcon(iconGlobal)			
 		self.settings.setIcon(iconSettings)			
-		self.about.setIcon(iconAbout)			
+		self.about.setIcon(iconAbout)
+		self.lang_dic = {}
+		self.langGroup = QActionGroup(self.language)
+		
+		for i in eval('self.'+self.currentLang.toUtf8().data()):
+			if QFileInfo('./lang/'+i+'.xml').exists():
+				self.lang_dic[i] = QAction(_fromUtf8(eval('self.'+self.currentLang.toUtf8().data()+'[i]')), self, triggered=self.setLanguage)
+				self.lang_dic[i].setCheckable(True)
+				self.langGroup.addAction(self.lang_dic[i])
+				self.language.addAction(self.lang_dic[i])
+		
+		if not self.lang_dic:
+			self.lang_dic[self.currentLang.toUtf8().data()] = QAction(_fromUtf8(eval('self.'+self.currentLang.toUtf8().data()+'[self.currentLang.toUtf8().data()]')), self, triggered=self.setLanguage)
+			self.lang_dic[self.currentLang.toUtf8().data()].setCheckable(True)
+			self.langGroup.addAction(self.lang_dic[self.currentLang.toUtf8().data()])
+			self.language.addAction(self.lang_dic[self.currentLang.toUtf8().data()])
+		self.lang_dic[self.currentLang.toUtf8().data()].setChecked(True)	
 		
 		self.contextMenu.addAction(self.open)
 		self.contextMenu.addAction(self.openURL)
 		self.contextMenu.addAction(self.save)
+		self.contextMenu.addSeparator()
+		self.contextMenu.addAction(self.language.menuAction())
 		self.contextMenu.addSeparator()
 		self.contextMenu.addAction(self.settings)
 		self.contextMenu.addSeparator()
@@ -243,16 +268,17 @@ class MainWindow(QMainWindow, QWidget):
 		self.connect(self, SIGNAL("loadCompleted()"), self.loadCompleted)
 		self.connect(self.ui.singleLine, SIGNAL('triggered()'), self.showSingleLineLyric)
 		self.connect(self.ui.multipleLines, SIGNAL('triggered()'), self.showMultipleLinesLyric)
-
 		self.logo.show()
 		self.initialUI()
 		self.initialTable()
+
 		config = QFileInfo('./playerconfig.ini')
 		if config.isReadable():
 			self.importIni(config.filePath())		
 		else:
 			self.emit(SIGNAL("loadCompleted()"))
-
+		self.setLanguage()
+			
 	def openFolder_all(self):
 		selectModel = self.ui.tableView.selectionModel()
 		selectedRows = selectModel.selectedRows()
@@ -346,12 +372,12 @@ class MainWindow(QMainWindow, QWidget):
 			self.playmbt.loadPixmap(QPixmap(":/icons/stop.png"))
 			self.playmbt.update()
 			self.playmbt.setText("Stop")
-			self.playmbt.setToolTip("Stop")
+			self.playmbt.setToolTip('Stop')
 		else:
 			self.playmbt.loadPixmap(QPixmap(":/icons/play.png"))
 			self.playmbt.update()		
 			self.playmbt.setText("Play")
-			self.playmbt.setToolTip("Play")
+			self.playmbt.setToolTip('Play')
 		self.shuffleAction.setChecked(self.ui.shuffle.isChecked())
 		self.repeat1Action.setChecked(self.ui.repeat1.isChecked())
 		self.repeatAction.setChecked(self.ui.repeat.isChecked())
@@ -659,8 +685,6 @@ class MainWindow(QMainWindow, QWidget):
 		if self.mediaObj.currentSource().type() == 4 and self.playingTab:
 			self.mediaObj.setCurrentSource(self.playList[0].getMediaSource())
 				
-		
-
 	def restoreTableAll(self):
 		unfavIcon = QIcon(":/icons/unfavorite.png")
 		favIcon = QIcon(":/icons/favorite.png")
@@ -716,8 +740,6 @@ class MainWindow(QMainWindow, QWidget):
 			else:
 				self.mediaObj.clear()
 				self.current = -1	
-			
-		#self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
 			
 	def menuPlayPressed(self):
 		if self.playmbt.text() == "Play":
@@ -1251,7 +1273,124 @@ class MainWindow(QMainWindow, QWidget):
 		self.model_2.horizontalHeaderItem(2).setTextAlignment(Qt.AlignRight)
 		self.ui.tableView_2.resizeRowsToContents()   
 		self.ui.tableView_2.setAlternatingRowColors(True)
-							
+
+	def setLanguage(self):
+		if self.lang_dic['en_us'].isChecked() and self.currentLang.contains('en_us'):
+			return
+			
+		for i in self.lang_dic:
+			if self.lang_dic[i].isChecked():
+				backup = self.currentLang
+				self.currentLang = QString(i)
+				doc = ET.parse('./lang/'+i+'.xml')  
+		try:
+			shuffleTips = doc.findall("./MainButton/Shuffle")[0].attrib['tooltips']		
+			repeatTips = doc.findall("./MainButton/RepeatAll")[0].attrib['tooltips']			
+			repeat1Tips = doc.findall("./MainButton/Single")[0].attrib['tooltips']			
+			playTips = doc.findall("./MainButton/Play")[0].attrib['tooltips']
+			nextTips = doc.findall("./MainButton/Next")[0].attrib['tooltips']
+			previousTips = doc.findall("./MainButton/Previous")[0].attrib['tooltips']
+			stopTips = doc.findall("./MainButton/Stop")[0].attrib['tooltips']
+			addTips = doc.findall("./AllTab/Button/Add")[0].attrib['tooltips']
+			deleteTips = doc.findall("./AllTab/Button/Del")[0].attrib['tooltips']
+			delete2Tips = doc.findall("./FavTab/Button/Remove")[0].attrib['tooltips']
+			searchTips = doc.findall("./AllTab/Button/Search")[0].attrib['tooltips']
+			saveTips = doc.findall("./AllTab/Button/Save")[0].attrib['tooltips']
+			save2Tips = doc.findall("./FavTab/Button/Save")[0].attrib['tooltips']
+			volumeTips = doc.findall("./MainButton/Volume")[0].attrib['tooltips']
+			showOnDeskTips = doc.findall("./Lyric/Button/ShowOnDesktop")[0].attrib['tooltips']
+			tabAllName = doc.findall("./Tab/AllMusic")[0].text
+			tabFavName = doc.findall("./Tab/Favorite")[0].text
+			tabLyricName = doc.findall("./Tab/Lyric")[0].text
+			open = doc.findall("./MainMenu/Open")[0].text
+			openURL = doc.findall("./MainMenu/OpenURL")[0].text
+			save = doc.findall("./MainMenu/Save")[0].text
+			language = doc.findall("./MainMenu/Lang")[0].text
+			settings = doc.findall("./MainMenu/Settings")[0].text
+			about = doc.findall("./MainMenu/About")[0].text
+			saveTo = doc.findall("./AllTab/Menu/SaveTo")[0].text
+			delete = doc.findall("./AllTab/Menu/Del")[0].text
+			addTo = doc.findall("./AllTab/Menu/AddTo")[0].text
+			openFolder = doc.findall("./AllTab/Menu/OpenFolder")[0].text
+			remove = doc.findall("./FavTab/Menu/Remove")[0].text			
+			showOnDesk = doc.findall("./Lyric/Menu/ShowOnDesktop")[0].text
+			singleLine = doc.findall("./Lyric/Menu/SingleLine")[0].text
+			multipleLine = doc.findall("./Lyric/Menu/MultipleLine")[0].text
+			entryTips = doc.findall("./Search/Tips")[0].text
+			lyricShow = doc.findall("./Lyric/Words")[0].text
+			mute = doc.findall("./Tray/Menu/Mute")[0].text
+			quit = doc.findall("./Tray/Menu/Quit")[0].text
+			playMode = doc.findall("./Tray/Menu/PlayMode")[0].text
+			
+			# tooltips		
+			self.ui.shuffle.setToolTip(shuffleTips)
+			self.ui.repeat.setToolTip(repeatTips)
+			self.ui.repeat1.setToolTip(repeat1Tips)
+			self.ui.play.setToolTip(playTips)
+			self.ui.next.setToolTip(nextTips)
+			self.ui.previous.setToolTip(previousTips)
+			self.ui.stop.setToolTip(stopTips)
+			self.ui.add.setToolTip(addTips)
+			self.ui.delete.setToolTip(deleteTips)
+			self.ui.delete_2.setToolTip(delete2Tips)
+			self.ui.search.setToolTip(searchTips)
+			self.ui.save.setToolTip(saveTips)
+			self.ui.save_2.setToolTip(save2Tips)
+			self.ui.volume.setToolTip(volumeTips)
+			self.ui.showOnDesk.setToolTip(showOnDeskTips)
+			
+			# tab name
+			self.ui.tabWidget.setTabText(self.ui.tabWidget.indexOf(self.ui.playListTab), _translate("MainWindow", tabAllName, None))
+			self.ui.tabWidget.setTabText(self.ui.tabWidget.indexOf(self.ui.favoriteTab), _translate("MainWindow", tabFavName, None))
+			self.ui.tabWidget.setTabText(self.ui.tabWidget.indexOf(self.ui.tab), _translate("MainWindow", tabLyricName, None))
+			
+			# main menu			
+			self.open.setText(open)
+			self.openURL.setText(openURL)
+			self.save.setText(save)
+			self.language.setTitle(language)
+			self.settings.setText(settings)
+			self.about.setText(about)
+			
+			# all table
+			self.ui.tableView.action.setText(saveTo)
+			self.ui.tableView.actionDelete.setText(delete)
+			self.ui.tableView.actionFavorite.setText(addTo)	
+			self.ui.tableView.actionFolder.setText(openFolder)	
+			
+			# favorite table
+			self.ui.tableView_2.action.setText(saveTo)
+			self.ui.tableView_2.actionFavorite.setText(remove)	
+			self.ui.tableView_2.actionFolder.setText(openFolder)
+
+			# show on desktop
+			self.ui.showOnDeskMenu.setTitle(showOnDesk)
+			self.ui.singleLine.setText(singleLine)
+			self.ui.multipleLines.setText(multipleLine)
+			
+			# tray
+			self.settingsAction.setText(settings)		
+			self.muteAction.setText(mute)	
+			self.quitAction.setText(quit)
+			self.shuffleAction.setText(shuffleTips)		
+			self.repeat1Action.setText(repeat1Tips)
+			self.repeatAction.setText(repeatTips)
+			self.playMode.setTitle(playMode)
+			self.previousmbt.setToolTip(previousTips)
+			self.nextmbt.setToolTip(nextTips)
+			
+			# search tips
+			self.searchWidget.lineEdit.setTips(entryTips)
+			
+			# language submenu
+			for i in self.lang_dic:
+				self.lang_dic[i].setText(_fromUtf8(eval('self.'+self.currentLang.toUtf8().data()+'[i]')))
+		except:
+			self.currentLang = backup
+			self.lang_dic[self.currentLang.toUtf8().data()].setChecked(True)
+			msg = failToApplyLangMsg(self)
+			msg.show()
+				
 	def fileChanged(self):		
 		index = self.getCurrentIndex()
 		self.current = index
@@ -1386,9 +1525,14 @@ class MainWindow(QMainWindow, QWidget):
 					break
 
 	def clearLyric(self):
-		self.lyric_ui.setText(_fromUtf8('Lyric Show.'))
-		self.ui.textEdit.setText(QString(''), QString(''), QString('Lyric Show.'), QString(''))
-		self.lyric_ui_scroll.setText(QString(''),  QString(''), QString('Lyric Show.'), QString(''))
+		doc = ET.parse('./lang/'+self.currentLang.toUtf8().data()+'.xml')
+		try:
+			words = doc.findall("./Lyric/Words")[0].text
+		except:
+			words = "Lyric Show"
+		self.lyric_ui.setText(_fromUtf8(words))
+		self.ui.textEdit.setText(QString(''), QString(''), QString(words), QString(''))
+		self.lyric_ui_scroll.setText(QString(''),  QString(''), QString(words), QString(''))
 
 	def stopLyric(self):
 		self.lyric_ui.stopMask()
@@ -1407,6 +1551,7 @@ class MainWindow(QMainWindow, QWidget):
 		cf.set('Player', 'shuffle', self.ui.shuffle.isChecked())
 		cf.set('Player', 'repeat1', self.ui.repeat1.isChecked())
 		cf.set('Player', 'repeat', self.ui.repeat.isChecked())
+		cf.set('Player', 'lang', self.currentLang)
 		if self.mediaObj.currentSource().type() != 4:
 			cf.set('Player', 'pos', '['+str(self.playingTab)+','+str(self.getCurrentIndex())+']')
 		favlst = []
@@ -1439,6 +1584,8 @@ class MainWindow(QMainWindow, QWidget):
 			self.ui.shuffle.setChecked(not cf.getboolean('Player', 'shuffle'))					
 			self.ui.repeat1.setChecked(not cf.getboolean('Player', 'repeat1'))
 			self.ui.repeat.setChecked(not cf.getboolean('Player', 'repeat'))
+			self.currentLang = QString(cf.get('Player', 'lang'))
+			self.lang_dic[cf.get('Player', 'lang')].setChecked(True)
 			self.singleRepeatOn()
 			self.repeatOn()
 			self.randomOn()
