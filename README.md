@@ -13,18 +13,13 @@ Beautiful Music Player written in Python 2.7 and PyQt.
 ####Features:
 
 * It supports MP3 and WMA format audio file.
-
 * Search by keywords.
-
 * Lyric show - Single line or Multiple lines.
-
 * Add to favorite.
-
 * Play mode - Single Cycle/Repeat All/Shuffle.
-
 * Save/Open m3u file.
-
 * Tray icon, tray menu.
+* Multiple-languages support.
 
 ####TODO:
 * Audio Spectrum show.
