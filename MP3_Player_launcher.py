@@ -1281,9 +1281,9 @@ class MainWindow(QMainWindow, QWidget):
 		for i in self.lang_dic:
 			if self.lang_dic[i].isChecked():
 				backup = self.currentLang
-				self.currentLang = QString(i)
-				doc = ET.parse('./lang/'+i+'.xml')  
+				self.currentLang = QString(i)				
 		try:
+			doc = ET.parse('./lang/'+i+'.xml')  
 			shuffleTips = doc.findall("./MainButton/Shuffle")[0].attrib['tooltips']		
 			repeatTips = doc.findall("./MainButton/RepeatAll")[0].attrib['tooltips']			
 			repeat1Tips = doc.findall("./MainButton/Single")[0].attrib['tooltips']			
@@ -1524,9 +1524,9 @@ class MainWindow(QMainWindow, QWidget):
 					self.lyric_ui_scroll.setText(lycF, lycM, self.lrc_lst[i][1], lycL, intervel)
 					break
 
-	def clearLyric(self):
-		doc = ET.parse('./lang/'+self.currentLang.toUtf8().data()+'.xml')
+	def clearLyric(self):		
 		try:
+			doc = ET.parse('./lang/'+self.currentLang.toUtf8().data()+'.xml')
 			words = doc.findall("./Lyric/Words")[0].text
 		except:
 			words = "Lyric Show"
