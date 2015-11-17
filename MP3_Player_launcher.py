@@ -1277,13 +1277,12 @@ class MainWindow(QMainWindow, QWidget):
 	def setLanguage(self):
 		if self.lang_dic['en_us'].isChecked() and self.currentLang.contains('en_us'):
 			return
-			
-		for i in self.lang_dic:
-			if self.lang_dic[i].isChecked():
-				backup = self.currentLang
-				self.currentLang = QString(i)				
-		try:
-			doc = ET.parse('./lang/'+i+'.xml')  
+		try:			
+			for i in self.lang_dic:
+				if self.lang_dic[i].isChecked():
+					backup = self.currentLang
+					self.currentLang = QString(i)	
+					doc = ET.parse('./lang/'+i+'.xml')							  
 			shuffleTips = doc.findall("./MainButton/Shuffle")[0].attrib['tooltips']		
 			repeatTips = doc.findall("./MainButton/RepeatAll")[0].attrib['tooltips']			
 			repeat1Tips = doc.findall("./MainButton/Single")[0].attrib['tooltips']			
