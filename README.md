@@ -1,6 +1,6 @@
 # PPlayer
 ####Introduction
-Beautiful Music Player written in Python 2.7 and PyQt.
+Music Player written in Python 2.7 and PyQt.
 
 ####Platform
 * Python 2.7 + PyQt4
@@ -12,7 +12,7 @@ Beautiful Music Player written in Python 2.7 and PyQt.
 
 ####Features:
 
-* It supports MP3 and WMA format audio file.
+* Supports MP3 and WMA format audio file.
 * Search by keywords.
 * Lyric show - Single line or Multiple lines.
 * Add to favorite.
