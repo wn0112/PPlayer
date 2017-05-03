@@ -12,9 +12,11 @@ Music Player code by Python 2.7 and PyQt.
 
 ## Features:
 
+* Resizable frameless window.
+* Scroll song name if it's too long.
 * Supports MP3 and WMA format audio file.
 * Search by keywords.
-* Lyric show - Single line or Multiple lines.
+* Lyric show - Single line/Multiple lines.
 * Add to favorite.
 * Play mode - Single Cycle/Repeat All/Shuffle.
 * Save/Open m3u file.
