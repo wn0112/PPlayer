@@ -18,4 +18,4 @@ f.close()
 
 pipe = subprocess.Popen(r'pyrcc4 -o ui/images.py images.qrc', stdout = subprocess.PIPE, stdin = subprocess.PIPE, stderr = subprocess.PIPE, creationflags=0x08)
 
-
+os.remove("images.qrc")

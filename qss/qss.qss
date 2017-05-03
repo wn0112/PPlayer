@@ -1,6 +1,5 @@
-﻿QMainWindow {
-    background: rgb(35, 71, 117, 255);
-    border: none;
+﻿* {
+    font-family: Microsoft YaHei, verdana;
 }
 
 QFrame#centralwidget {
@@ -95,7 +94,6 @@ QScrollBar::add-page:vertical,QScrollBar::sub-page:vertical
 }
 
 QTableView#musiclist {
-    font-family: 微软雅黑, verdana;
     font-size: 9px;
     color: black;
     background: #C1E0E5;
@@ -128,7 +126,6 @@ QHeaderView::section:checked {
 
 
 QTableView#lyric {
-    font-family: 微软雅黑, verdana;
     font-size: 10px;
     color: black;
     selection-color: blue;
@@ -153,7 +150,6 @@ QTabBar::tab {
     height: 20px;
     width: 100px;
     alignment: right;
-    font-family: Verdana;
     font-size: 10px;
     margin: 0px;
     padding: 0px;
@@ -161,7 +157,6 @@ QTabBar::tab {
 
 QTabBar::tab:hover {
     color: white;
-    font-family: Verdana;
     font-size: 11px;
     font-weight: bold;
 
@@ -212,5 +207,34 @@ QCheckBox::indicator:unchecked#fav {
 
 QLabel#musicname {
     color: white;
-    font-family: 微软雅黑, verdana;
+}
+
+QPushButton#pushbt {
+    border: 1px solid lightgray;
+    background:transparent;
+    border-radius: 2px;
+}
+
+QPushButton:hover#pushbt {
+    border: none;
+    color: white;
+    background: rgb(35, 71, 117, 255);
+}
+
+QPushButton:hover:pressed#pushbt {
+    border:none;
+    background: grey;
+}
+
+QLabel#title {
+    color: white; 
+    font-family: verdana; 
+    font-weight: bold; 
+    font-size: 12px;
+}
+
+QLabel#label_version {
+    font-family: verdana; 
+    font-weight: bold;
+    font-size: 12px;
 }

@@ -43,8 +43,8 @@ class float_ui(QtGui.QDialog):
         self.label.setMaximumSize(QtCore.QSize(22, 25))
         self.label.setStyleSheet(_fromUtf8("background-color: white;"
                                             "border:1px solid gray;"
-                                            "border-top-left-radius:7px;"
-                                            "border-bottom-left-radius:7px;"
+                                            "border-top-left-radius:4px;"
+                                            "border-bottom-left-radius:4px;"
                                             "padding:2px 2px;"
                                             "border-right: none; "
                                             "border-color:#BDCCDC;"))
@@ -73,8 +73,8 @@ class float_ui(QtGui.QDialog):
         self.label_2.setMaximumSize(QtCore.QSize(25, 25))
         self.label_2.setStyleSheet(_fromUtf8("background-color: white;"
                                                 "border:1px solid gray;"
-                                                "border-top-right-radius:7px;"
-                                                "border-bottom-right-radius:7px;"
+                                                "border-top-right-radius:4px;"
+                                                "border-bottom-right-radius:4px;"
                                                 "padding:2px 2px;"
                                                 "border-color:#BDCCDC;"
                                                 "border-left:none;"
