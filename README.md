@@ -8,7 +8,7 @@ Music Player code by Python 2.7 and PyQt.
 
 ## How to run
 * run.py &nbsp;  <b><<< Launcher file.</b>
-* PPlayer.exe  &nbsp;&nbsp;<b><<<  Packaged EXE file(by Pyinstaller).</b>
+* PPlayer.exe  &nbsp;&nbsp;<b><<<  Packaged EXE file(Packaged by Pyinstaller).</b>
 
 ## Features:
 
