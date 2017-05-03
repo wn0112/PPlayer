@@ -1,95 +1,95 @@
 ﻿<?xml version="1.0" ?>
 <MainWindow>
- <MainMenu>
-  <Open>Open</Open>
-  <OpenURL>Open URL...</OpenURL>
-  <Save>Save as playlist...</Save>
-  <Lang>Language</Lang>
-  <Settings>Settings...</Settings>
-  <About>About</About>
- </MainMenu>
- <MainButton>
-  <Shuffle tooltips="Random"/>
-  <Single tooltips="Single Cycle"/>
-  <RepeatAll tooltips="Repeat All"/>
-  <Previous tooltips="Previous"/>
-  <Play tooltips="Play"/>
-  <Stop tooltips="Stop"/>
-  <Next tooltips="Next"/>
-  <Volume tooltips="Volume"/>
- </MainButton>
- <Tab>
-  <AllMusic>All Music</AllMusic>
-  <Favorite>My Favorite</Favorite>
-  <Lyric>Lyric</Lyric>
- </Tab>
- <AllTab>
-  <Button>
-   <Add tooltips="Add Music"/>
-   <Save tooltips="Save as Playlist"/>
-   <Del tooltips="Delete"/>
-   <Search tooltips="Search"/>
-  </Button>
-  <Menu>
-   <AddTo>Add to My Favorite</AddTo>
-   <SaveTo>Save as playlist...</SaveTo>
-   <Del>Delete</Del>
-   <OpenFolder>Open the folder</OpenFolder>	
-  </Menu>
- </AllTab>
- <FavTab>
-  <Button>
-   <Save tooltips="Save as playlist"/>
-   <Remove tooltips="Remove"/>
-  </Button>
-  <Menu>
-   <Remove>Remove</Remove>
-   <SaveTo>Save as playlist...</SaveTo>
-   <OpenFolder>Open the folder</OpenFolder>	
-  </Menu>
- </FavTab>
- <Lyric>
-  <Menu>
-   <ShowOnDesktop>Show On Desktop</ShowOnDesktop>
-   <SingleLine>Single Line</SingleLine>
-   <MultipleLine>Multiple Lines</MultipleLine>
-  </Menu>
-  <Button>
-   <ShowOnDesktop tooltips="Show On Desktop"/>
-  </Button>
-  <Words>Lyric Show</Words>
- </Lyric>
- <Tray>
-  <Button>
-   <Previous tooltips="Previous"/>
-   <Play tooltips="Play"/>
-   <Stop tooltips="Stop"/>
-   <Next tooltips="Next"/>
-  </Button>
-  <Menu>
-   <PlayMode>Play Mode</PlayMode>
-   <Shuffle>Random</Shuffle>
-   <Single>Single Cycle</Single>
-   <RepeatAll>Repeat All</RepeatAll>
-   <Mute>Mute</Mute>
-   <Settings>Settings...</Settings>
-   <Quit>Quit</Quit>
-  </Menu>
- </Tray>
- <Search>
-  <Tips>Type keywords to search...</Tips>
- </Search>
- <Message>
- <Button>
-  <OK>OK</OK>
-  <Cancel>Cancel</Cancel>
-  <Browse>Browse...</Browse>
- </Button>
- <OpenURLTitle>Open URL</OpenURLTitle>
- <URLInfo>Enter the URL or path to a media file on the Internet, your computer, or your network that you want to play.</URLInfo>
- <InvalidURL>Not a valid URL.</InvalidURL>
- <PromMsgTitle>Error</PromMsgTitle>
- <InvalidFileTitle>Unrecognized files</InvalidFileTitle>
- <InvalidFileMsg>Failed to play following files:</InvalidFileMsg>
- </Message>
+    <MainMenu>
+        <Open>Open</Open>
+        <OpenURL>Open URL...</OpenURL>
+        <Save>Save as playlist...</Save>
+        <Lang>Language</Lang>
+        <Settings>Settings...</Settings>
+        <About>About</About>
+    </MainMenu>
+    <MainButton>
+        <Shuffle tooltips="Random"/>
+        <Single tooltips="Single Cycle"/>
+        <RepeatAll tooltips="Repeat All"/>
+        <Previous tooltips="Previous"/>
+        <Play tooltips="Play"/>
+        <Stop tooltips="Stop"/>
+        <Next tooltips="Next"/>
+        <Volume tooltips="Volume"/>
+    </MainButton>
+    <Tab>
+        <AllMusic>All Music</AllMusic>
+        <Favorite>My Favorite</Favorite>
+        <Lyric>Lyric</Lyric>
+    </Tab>
+    <AllTab>
+        <Button>
+            <Add tooltips="Add Music"/>
+            <Save tooltips="Save as Playlist"/>
+            <Del tooltips="Delete"/>
+            <Search tooltips="Search"/>
+        </Button>
+        <Menu>
+            <AddTo>Add to My Favorite</AddTo>
+            <SaveTo>Save as playlist...</SaveTo>
+            <Del>Delete</Del>
+            <OpenFolder>Open the folder</OpenFolder>	
+        </Menu>
+    </AllTab>
+    <FavTab>
+        <Button>
+            <Save tooltips="Save as playlist"/>
+            <Remove tooltips="Remove"/>
+        </Button>
+        <Menu>
+            <Remove>Remove</Remove>
+            <SaveTo>Save as playlist...</SaveTo>
+            <OpenFolder>Open the folder</OpenFolder>	
+        </Menu>
+    </FavTab>
+    <Lyric>
+        <Menu>
+            <ShowOnDesktop>Show On Desktop</ShowOnDesktop>
+            <SingleLine>Single Line</SingleLine>
+            <MultipleLine>Multiple Lines</MultipleLine>
+        </Menu>
+        <Button>
+            <ShowOnDesktop tooltips="Show On Desktop"/>
+        </Button>
+        <Words>Lyric Show</Words>
+    </Lyric>
+    <Tray>
+        <Button>
+            <Previous tooltips="Previous"/>
+            <Play tooltips="Play"/>
+            <Stop tooltips="Stop"/>
+            <Next tooltips="Next"/>
+        </Button>
+        <Menu>
+            <PlayMode>Play Mode</PlayMode>
+            <Shuffle>Random</Shuffle>
+            <Single>Single Cycle</Single>
+            <RepeatAll>Repeat All</RepeatAll>
+            <Mute>Mute</Mute>
+            <Settings>Settings...</Settings>
+            <Quit>Quit</Quit>
+        </Menu>
+    </Tray>
+    <Search>
+        <Tips>Type keywords to search...</Tips>
+    </Search>
+    <Message>
+    <Button>
+        <OK>OK</OK>
+        <Cancel>Cancel</Cancel>
+        <Browse>Browse...</Browse>
+    </Button>
+    <OpenURLTitle>Open URL</OpenURLTitle>
+    <URLInfo>Enter the URL or path to a media file on the Internet, your computer, or your network that you want to play.</URLInfo>
+    <InvalidURL>Not a valid URL.</InvalidURL>
+    <PromMsgTitle>Error</PromMsgTitle>
+    <InvalidFileTitle>Unrecognized files</InvalidFileTitle>
+    <InvalidFileMsg>Failed to play following files:</InvalidFileMsg>
+    </Message>
 </MainWindow>

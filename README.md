@@ -1,13 +1,13 @@
 # PPlayer
 ####Introduction
-Music Player written in Python 2.7 and PyQt.
+Music Player code by Python 2.7 and PyQt.
 
 ####Platform
 * Python 2.7 + PyQt4
 * Windows 7 x86/x64, CHS/EN
 
 ####How to run
-* <a href="https://github.com/wn0112/PPlayer/blob/master/MP3_Player_launcher.py">MP3_Player_launcher.py</a> &nbsp;  <b><<< Launcher file.</b>
+* <a href="https://github.com/wn0112/PPlayer/blob/master/run.py">run.py</a> &nbsp;  <b><<< Launcher file.</b>
 * PPlayer.exe  &nbsp;&nbsp;<b><<<  Packaged EXE file(by Pyinstaller).</b>
 
 ####Features:

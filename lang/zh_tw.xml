@@ -1,95 +1,95 @@
 <?xml version="1.0" ?>
 <MainWindow>
- <MainMenu>
-  <Open>打開</Open>
-  <OpenURL>打開URL...</OpenURL>
-  <Save>保存爲播放列表...</Save>
-  <Lang>語言</Lang>
-  <Settings>設置...</Settings>
-  <About>關於</About>
- </MainMenu>
- <MainButton>
-  <Shuffle tooltips="隨機播放"/>
-  <Single tooltips="單曲循環"/>
-  <RepeatAll tooltips="重復全部"/>
-  <Previous tooltips="上一首"/>
-  <Play tooltips="播放"/>
-  <Stop tooltips="停止"/>
-  <Next tooltips="下一首"/>
-  <Volume tooltips="音量"/>
- </MainButton>
- <Tab>
-  <AllMusic>所有音樂</AllMusic>
-  <Favorite>我的收藏</Favorite>
-  <Lyric>歌詞</Lyric>
- </Tab>
- <AllTab>
-  <Button>
-   <Add tooltips="添加歌曲"/>
-   <Save tooltips="保存爲播放列表"/>
-   <Del tooltips="刪除"/>
-   <Search tooltips="搜索"/>
-  </Button>
-  <Menu>
-   <AddTo>添加到我的收藏</AddTo>
-   <SaveTo>保存爲播放列表...</SaveTo>
-   <Del>刪除</Del>
-   <OpenFolder>打開所在目錄</OpenFolder>	
-  </Menu>
- </AllTab>
- <FavTab>
-  <Button>
-   <Save tooltips="保存爲播放列表"/>
-   <Remove tooltips="移除"/>
-  </Button>
-  <Menu>
-   <Remove>移除</Remove>
-   <SaveTo>保存爲播放列表...</SaveTo>
-   <OpenFolder>打開所在目錄</OpenFolder>	
-  </Menu>
- </FavTab>
- <Lyric>
-  <Menu>
-   <ShowOnDesktop>在桌面顯示</ShowOnDesktop>
-   <SingleLine>單行</SingleLine>
-   <MultipleLine>多行</MultipleLine>
-  </Menu>
-  <Button>
-   <ShowOnDesktop tooltips="在桌面顯示"/>
-  </Button>
-  <Words>歌詞秀</Words>
- </Lyric>
- <Tray>
-  <Button>
-   <Previous tooltips="上一首"/>
-   <Play tooltips="播放"/>
-   <Stop tooltips="停止"/>
-   <Next tooltips="下一首"/>
-  </Button>
-  <Menu>
-   <PlayMode>播放模式</PlayMode>
-   <Shuffle>隨機播放</Shuffle>
-   <Single>單曲循環</Single>
-   <RepeatAll>重復全部</RepeatAll>
-   <Mute>靜音</Mute>
-   <Settings>設置...</Settings>
-   <Quit>退出</Quit>
-  </Menu>
- </Tray>
- <Search>
-  <Tips>輸入文字來搜索...</Tips>
- </Search>
- <Message>
- <Button>
-  <OK>確定</OK>
-  <Cancel>取消</Cancel>
-  <Browse>瀏覽...</Browse>
- </Button>
- <OpenURLTitle>打開URL</OpenURLTitle>
- <URLInfo>請輸入所要播放文件的URL地址或者路徑.</URLInfo>
- <InvalidURL>不是有效的URL.</InvalidURL>
- <PromMsgTitle>錯誤</PromMsgTitle>
- <InvalidFileTitle>無法識別的文件</InvalidFileTitle>
- <InvalidFileMsg>無法播放以下文件:</InvalidFileMsg>
- </Message>
+    <MainMenu>
+        <Open>打開</Open>
+        <OpenURL>打開URL...</OpenURL>
+        <Save>保存爲播放列表...</Save>
+        <Lang>語言</Lang>
+        <Settings>設置...</Settings>
+        <About>關於</About>
+    </MainMenu>
+    <MainButton>
+        <Shuffle tooltips="隨機播放"/>
+        <Single tooltips="單曲循環"/>
+        <RepeatAll tooltips="重復全部"/>
+        <Previous tooltips="上一首"/>
+        <Play tooltips="播放"/>
+        <Stop tooltips="停止"/>
+        <Next tooltips="下一首"/>
+        <Volume tooltips="音量"/>
+    </MainButton>
+    <Tab>
+        <AllMusic>所有音樂</AllMusic>
+        <Favorite>我的收藏</Favorite>
+        <Lyric>歌詞</Lyric>
+    </Tab>
+    <AllTab>
+        <Button>
+            <Add tooltips="添加歌曲"/>
+            <Save tooltips="保存爲播放列表"/>
+            <Del tooltips="刪除"/>
+            <Search tooltips="搜索"/>
+        </Button>
+        <Menu>
+            <AddTo>添加到我的收藏</AddTo>
+            <SaveTo>保存爲播放列表...</SaveTo>
+            <Del>刪除</Del>
+            <OpenFolder>打開所在目錄</OpenFolder>	
+        </Menu>
+    </AllTab>
+    <FavTab>
+        <Button>
+            <Save tooltips="保存爲播放列表"/>
+            <Remove tooltips="移除"/>
+        </Button>
+        <Menu>
+            <Remove>移除</Remove>
+            <SaveTo>保存爲播放列表...</SaveTo>
+            <OpenFolder>打開所在目錄</OpenFolder>	
+        </Menu>
+    </FavTab>
+    <Lyric>
+        <Menu>
+            <ShowOnDesktop>在桌面顯示</ShowOnDesktop>
+            <SingleLine>單行</SingleLine>
+            <MultipleLine>多行</MultipleLine>
+        </Menu>
+        <Button>
+            <ShowOnDesktop tooltips="在桌面顯示"/>
+        </Button>
+        <Words>歌詞秀</Words>
+    </Lyric>
+    <Tray>
+        <Button>
+            <Previous tooltips="上一首"/>
+            <Play tooltips="播放"/>
+            <Stop tooltips="停止"/>
+            <Next tooltips="下一首"/>
+        </Button>
+        <Menu>
+            <PlayMode>播放模式</PlayMode>
+            <Shuffle>隨機播放</Shuffle>
+            <Single>單曲循環</Single>
+            <RepeatAll>重復全部</RepeatAll>
+            <Mute>靜音</Mute>
+            <Settings>設置...</Settings>
+            <Quit>退出</Quit>
+        </Menu>
+    </Tray>
+    <Search>
+        <Tips>輸入文字來搜索...</Tips>
+    </Search>
+    <Message>
+    <Button>
+        <OK>確定</OK>
+        <Cancel>取消</Cancel>
+        <Browse>瀏覽...</Browse>
+    </Button>
+    <OpenURLTitle>打開URL</OpenURLTitle>
+    <URLInfo>請輸入所要播放文件的URL地址或者路徑.</URLInfo>
+    <InvalidURL>不是有效的URL.</InvalidURL>
+    <PromMsgTitle>錯誤</PromMsgTitle>
+    <InvalidFileTitle>無法識別的文件</InvalidFileTitle>
+    <InvalidFileMsg>無法播放以下文件:</InvalidFileMsg>
+    </Message>
 </MainWindow>
