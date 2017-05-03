@@ -408,7 +408,7 @@ class MainWindow(QMainWindow, QWidget):
         if not self.ui.search.isChecked():
             self.ui.search.setChecked(True)    
             self.searchWidget.resize(self.width()-12, 35)            
-            self.searchWidget.move(self.pos().x()+6, self.pos().y()+self.rect().height()-self.ui.operationFrame.height()-36)
+            self.searchWidget.move(self.pos().x()+6, self.pos().y()+self.rect().height()-self.ui.operationFrame.height()-41)
             self.searchWidget.show()
         elif self.ui.search.isChecked() and self.searchWidget.lineEdit.text():
             self.restoreTableAll()
