@@ -49,7 +49,7 @@ class MainWindow(QMainWindow, QWidget):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         sip.setdestroyonexit(False)
-        self.border = 4
+        self.border = 9
         self.path = QString()
         self.playList = []
         self.allList = []
