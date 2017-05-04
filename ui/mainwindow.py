@@ -340,10 +340,10 @@ class Ui_MainWindow(object):
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        effect = QGraphicsDropShadowEffect()
-        effect.setOffset(2)
-        effect.setBlurRadius(5)
-        self.centralwidget.setGraphicsEffect(effect)
+        # effect = QGraphicsDropShadowEffect()
+        # effect.setOffset(2)
+        # effect.setBlurRadius(5)
+        # self.centralwidget.setGraphicsEffect(effect)
         
     def retranslateUi(self, MainWindow):
         icon = QIcon()
