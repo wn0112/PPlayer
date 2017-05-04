@@ -7,6 +7,15 @@ QFrame#centralwidget {
     border: none;
 }
 
+QFrame#dlgmainwidget {
+    background: white;
+    border: 1px solid grey;
+}
+
+QFrame#titleframe {
+    background: rgb(35, 71, 117, 255);
+}
+
 QSlider::groove:horizontal {
     border: 1px solid white;
     height: 0px;

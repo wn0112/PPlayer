@@ -3,7 +3,7 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from mybuttons import *
 from xml.etree import ElementTree as ET
-import images
+import images, ui
 
 
 try:
@@ -26,20 +26,23 @@ class about(QDialog):
         super(about, self).__init__(parent)
         self.setWindowModality(Qt.ApplicationModal)
         self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setWindowFlags(Qt.CustomizeWindowHint | Qt.FramelessWindowHint | Qt.Dialog)    
-        self.verticalLayout = QVBoxLayout(self)
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
+        self.layout = QHBoxLayout(self)
+        self.layout.setContentsMargins(5, 5, 5, 5)
+        self.mainWidget = QFrame(self)
+        self.mainWidget.setObjectName(_fromUtf8("dlgmainwidget"))
+        self.layout.addWidget(self.mainWidget)
+        self.verticalLayout = QVBoxLayout(self.mainWidget)
         self.verticalLayout.setSpacing(0)
-        self.verticalLayout.setMargin(0)
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)        
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.titleFrame = QFrame(self)
+        self.titleFrame.setObjectName(_fromUtf8("titleframe"))
         self.titleFrame.setMaximumSize(QSize(16777215, 30))
-        self.titleFrame.setFrameShape(QFrame.NoFrame)
-        self.titleFrame.setFrameShadow(QFrame.Raised)
         self.verticalLayout.addWidget(self.titleFrame, 0, Qt.AlignTop)
         self.horizontalLayout = QHBoxLayout(self.titleFrame)
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setMargin(0)
-        self.horizontalLayout.setContentsMargins(5, 5, 5, 0)
+        self.horizontalLayout.setContentsMargins(5, 5, 5, 5)
         self.iconLabel = QLabel(self.titleFrame)
         self.iconLabel.setScaledContents(True)
         self.iconLabel.setMaximumSize(20, 20)
@@ -60,13 +63,17 @@ class about(QDialog):
         QMetaObject.connectSlotsByName(self)
         self.connect(self.closeBt, SIGNAL("clicked()"), self.close)
         self.setupUI()
+        effect = QGraphicsDropShadowEffect(self.mainWidget)
+        effect.setOffset(2)
+        effect.setBlurRadius(5)
+        self.mainWidget.setGraphicsEffect(effect)
 
     def setupUI(self):
         self.setTitleIcon(":/icons/appicon.png")
         self.setTitle("About")
         self.resize(280, 184)
         self.icon = QLabel(self)
-        self.icon.setGeometry(QRect(20, 40, 70, 70))
+        self.icon.setGeometry(QRect(20, 50, 70, 70))
         self.icon.setMinimumSize(QSize(70, 70))
         self.icon.setMaximumSize(QSize(70, 70))
         self.icon.setText(_fromUtf8(""))
@@ -102,46 +109,14 @@ class about(QDialog):
         self.titleLabel.setText(str)
 
     def isInTitle(self, xPos, yPos):
-        return yPos <= 30 and not (yPos <= 22 and (xPos >= self.closeBt.pos().x() and xPos <= self.closeBt.pos().x() + 47))    
+        return yPos <= 40 and not (yPos <= 22 and (xPos >= self.closeBt.pos().x() and xPos <= self.closeBt.pos().x() + 47))    
 
-    def paintEvent(self, event):
-        linear = QLinearGradient(QPoint(self.rect().topLeft()), QPoint(self.rect().bottomLeft()))
-        linear.start()
-        linear.setColorAt(0, QColor(35, 71, 117, 255))
-        linear.finalStop()
-        
-        self.painter = QPainter()
-        self.painter.begin(self)
-        self.painter.setBrush(linear)
-        self.painter.drawRect(QRect(0, 0, self.width(), 30))
-        self.painter.end()
-
-        linear2 = QLinearGradient(QPoint(self.rect().topLeft()), QPoint(self.rect().bottomLeft()))
-        linear2.start()
-        linear2.setColorAt(0, Qt.white)
-        linear2.finalStop()
-        
-        self.painter2 = QPainter()
-        self.painter2.begin(self)
-        self.painter2.setBrush(linear2)
-        self.painter2.drawRect(QRect(0, 30, self.width(), self.height() - 30));
-        self.painter2.end()
-        
-        self.painter3 = QPainter()
-        self.painter3.begin(self)
-        self.painter3.setPen(Qt.gray)
-        self.painter3.drawPolyline(QPointF(0, 0), QPointF(0, self.height() - 1), QPointF(self.width() - 1, self.height() - 1), QPointF(self.width() - 1, 0))
-        self.painter3.drawPolyline(QPointF(0, 0), QPointF(self.width() - 1, 0))
-        self.painter3.end()        
         
 class openURL(about):
-    def __init__(self, parent=None):
-        super(openURL, self).__init__(parent)
-
     def setupUI(self):
         try:
-            if QtCore.QFile('./lang/'+self.parent().currentLang.toUtf8().data()+'.xml').exists():
-                self.doc = ET.parse('./lang/'+self.parent().currentLang.toUtf8().data()+'.xml')
+            if QtCore.QFile(ui.path + '/lang/'+self.parent().currentLang.toUtf8().data()+'.xml').exists():
+                self.doc = ET.parse(ui.path + '/lang/'+self.parent().currentLang.toUtf8().data()+'.xml')
                 title = _fromUtf8(self.doc.findall("./Message/OpenURLTitle")[0].text)
                 okBt = self.doc.findall("./Message/Button/OK")[0].text
                 cancelBt = self.doc.findall("./Message/Button/Cancel")[0].text
@@ -234,13 +209,11 @@ class openURL(about):
                 msg.show()
                 
 class promptMsg(about):
-    def __init__(self, parent=None):
-        super(promptMsg, self).__init__(parent)
-        
+
     def setupUI(self):
         try:
-            if QtCore.QFile('./lang/'+self.parent().parent().currentLang.toUtf8().data()+'.xml').exists():
-                self.doc = ET.parse('./lang/'+self.parent().parent().currentLang.toUtf8().data()+'.xml')  
+            if QtCore.QFile(ui.path + '/lang/'+self.parent().parent().currentLang.toUtf8().data()+'.xml').exists():
+                self.doc = ET.parse(ui.path + '/lang/'+self.parent().parent().currentLang.toUtf8().data()+'.xml')  
                 title = _fromUtf8(self.doc.findall("./Message/PromMsgTitle")[0].text)
                 info = _fromUtf8(self.doc.findall("./Message/InvalidURL")[0].text)
                 okBt = _fromUtf8(self.doc.findall("./Message/Button/OK")[0].text)
@@ -272,13 +245,11 @@ class promptMsg(about):
         self.connect(self.ok, SIGNAL("clicked()"), self.close)
 
 class invalidFileMsg(about):
-    def __init__(self, parent=None):
-        super(invalidFileMsg, self).__init__(parent)
-        
+
     def setupUI(self):
         try:
-            if QtCore.QFile('./lang/'+self.parent().currentLang.toUtf8().data()+'.xml').exists():
-                self.doc = ET.parse('./lang/'+self.parent().currentLang.toUtf8().data()+'.xml')  
+            if QtCore.QFile(ui.path + '/lang/'+self.parent().currentLang.toUtf8().data()+'.xml').exists():
+                self.doc = ET.parse(ui.path + '/lang/'+self.parent().currentLang.toUtf8().data()+'.xml')  
                 title = _fromUtf8(self.doc.findall("./Message/InvalidFileTitle")[0].text)
                 info = _fromUtf8(self.doc.findall("./Message/InvalidFileMsg")[0].text)
                 okBt = _fromUtf8(self.doc.findall("./Message/Button/OK")[0].text)
@@ -316,9 +287,7 @@ class invalidFileMsg(about):
         self.filesname.setText(s)
 
 class failToApplyLangMsg(about):
-    def __init__(self, parent=None):
-        super(failToApplyLangMsg, self).__init__(parent)
-        
+   
     def setupUI(self):
         title = QString("Error")
         info = QString("Fail to apply language file.")

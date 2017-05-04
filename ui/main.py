@@ -12,6 +12,7 @@ from mutagen.asf import ASF        # mutagen v1.30
 from progressslider import *
 import sip, sys, random, ConfigParser, images, re, chardet, locale, codecs
 from xml.etree import ElementTree as ET
+import ui
 defaultcode = 'utf-8'
 
 c = QString(locale.getdefaultlocale()[0]).toLower()
@@ -113,7 +114,7 @@ class MainWindow(QMainWindow, QWidget):
         self.langGroup = QActionGroup(self.language)
 
         for i in eval('self.'+self.currentLang.toUtf8().data()):
-            if QFileInfo('./lang/'+i+'.xml').exists():
+            if QFileInfo(ui.path + '/lang/'+i+'.xml').exists():
                 self.lang_dic[i] = QAction(_fromUtf8(eval('self.'+self.currentLang.toUtf8().data()+'[i]')), self, triggered=self.setLanguage)
                 self.lang_dic[i].setCheckable(True)
                 self.langGroup.addAction(self.lang_dic[i])
@@ -269,7 +270,7 @@ class MainWindow(QMainWindow, QWidget):
         self.initialUI()
         self.initialTable()
 
-        config = QFileInfo('./playerconfig.ini')
+        config = QFileInfo(ui.path + '/playerconfig.ini')
         if config.isReadable():
             self.importIni(config.filePath())        
         else:
@@ -303,7 +304,7 @@ class MainWindow(QMainWindow, QWidget):
     def hideMainWindow(self):        
         self.showMinimized()
         self.hide()
-        self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
+        self.emit(SIGNAL("autoSave(QString)"), _fromUtf8(ui.path + '/playerconfig.ini'))
 
     def clickStarAll(self, index):
         i = index.row()
@@ -576,7 +577,7 @@ class MainWindow(QMainWindow, QWidget):
             self.playingTab = 0
             self.playList = self.allList
 
-        self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
+        self.emit(SIGNAL("autoSave(QString)"), _fromUtf8(ui.path + '/playerconfig.ini'))
 
     def addToPlayList(self):
         file = QFileDialog.getSaveFileName(self, 'Save Playlist', './', 'M3U File (*.m3u);;')
@@ -1053,7 +1054,7 @@ class MainWindow(QMainWindow, QWidget):
         self.ui.statusLabel.setToolTip("Ready")
         self.movie.stop()
         # self.th1.quit()
-        self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
+        self.emit(SIGNAL("autoSave(QString)"), _fromUtf8(ui.path + '/playerconfig.ini'))
 
     def addMusicFromURL(self, url):
         newfile = AudioFile(url)
@@ -1279,7 +1280,7 @@ class MainWindow(QMainWindow, QWidget):
                 if self.lang_dic[i].isChecked():
                     backup = self.currentLang
                     self.currentLang = QString(i)    
-                    doc = ET.parse('./lang/'+i+'.xml')                              
+                    doc = ET.parse(ui.path + '/lang/'+i+'.xml')                              
             shuffleTips = doc.findall("./MainButton/Shuffle")[0].attrib['tooltips']        
             repeatTips = doc.findall("./MainButton/RepeatAll")[0].attrib['tooltips']            
             repeat1Tips = doc.findall("./MainButton/Single")[0].attrib['tooltips']            
@@ -1522,7 +1523,7 @@ class MainWindow(QMainWindow, QWidget):
 
     def clearLyric(self):        
         try:
-            doc = ET.parse('./lang/'+self.currentLang.toUtf8().data()+'.xml')
+            doc = ET.parse(ui.path + '/lang/'+self.currentLang.toUtf8().data()+'.xml')
             words = doc.findall("./Lyric/Words")[0].text
         except:
             words = "Lyric Show"
@@ -1639,7 +1640,7 @@ class MainWindow(QMainWindow, QWidget):
 
     def closeEvent(self, event):
         if self.movie.state() == 0:
-            self.emit(SIGNAL("autoSave(QString)"), _fromUtf8('./playerconfig.ini'))
+            self.emit(SIGNAL("autoSave(QString)"), _fromUtf8(ui.path + '/playerconfig.ini'))
         event.accept()    
 
     def dragEnterEvent(self, event):

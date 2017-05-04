@@ -342,7 +342,6 @@ class Ui_MainWindow(object):
 
         effect = QGraphicsDropShadowEffect()
         effect.setOffset(2)
-        effect.setColor(Qt.black)
         effect.setBlurRadius(5)
         self.centralwidget.setGraphicsEffect(effect)
         
