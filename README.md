@@ -4,7 +4,7 @@ Music Player code by Python 2.7 and PyQt.
 
 ## Platform
 * Python 2.7 + PyQt4
-* Windows 7 x86/x64, CHS/EN
+* Windows 7, 10 x86/x64, CHS/EN
 
 ## How to run
 * run.py &nbsp;  <b><<< Launcher file.</b>
