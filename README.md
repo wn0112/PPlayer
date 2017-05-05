@@ -6,11 +6,11 @@ Music Player code by Python 2.7 and PyQt.
 * Windows 7, Windows 10 x86/x64, CHS/EN
 
 ## Requirements
-* Python 2.7
-* PyQt4
-* mutagen
-* chardet
-* ConfigParser
+* <a href="https://www.python.org/ftp/python/2.7.13/python-2.7.13.msi">Python 2.7</a>
+* <a href="https://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.4/PyQt4-4.11.4-gpl-Py2.7-Qt4.8.7-x32.exe">PyQt4</a>
+* <a href="https://pypi.python.org/pypi/mutagen">mutagen</a>
+* <a href="https://pypi.python.org/pypi/chardet">chardet</a>
+* <a href="https://pypi.python.org/pypi/configparser/">ConfigParser</a>
 
 ## How to run
 * run.py &nbsp;  <b><<< Launcher file.</b>
