@@ -2,9 +2,15 @@
 ## Introduction
 Music Player code by Python 2.7 and PyQt.
 
-## Platform
-* Python 2.7 + PyQt4
-* Windows 7, 10 x86/x64, CHS/EN
+## OS
+* Windows 7, Windows 10 x86/x64, CHS/EN
+
+## Requirements
+* Python 2.7
+* PyQt4
+* mutagen
+* chardet
+* ConfigParser
 
 ## How to run
 * run.py &nbsp;  <b><<< Launcher file.</b>
