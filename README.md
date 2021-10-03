@@ -1,6 +1,6 @@
 # PPlayer
 ## Introduction
-Music Player code by Python 2.7 and PyQt.
+Music Player code by Python 2.7 and PyQt
 
 ## OS
 * Windows 7, Windows 10 x86/x64, CHS/EN
@@ -13,25 +13,25 @@ Music Player code by Python 2.7 and PyQt.
 * <a href="https://pypi.python.org/pypi/configparser/">ConfigParser</a>
 
 ## How to run
-* run.py &nbsp;  <b><<< Launcher file.</b>
-* PPlayer.exe  &nbsp;&nbsp;<b><<<  Packaged EXE file(Packaged by Pyinstaller).</b>
+* <b>Launcher file>>></b> run.py &nbsp;
+* <b>Packaged EXE file(Packaged by Pyinstaller)>>></b> PPlayer.exe  &nbsp;&nbsp;
 
 ## Features:
 
-* Resizable frameless window.
-* Scroll song name if it's too long.
-* Supports MP3 and WMA format audio file.
-* Search by keywords.
-* Lyric show - Single line/Multiple lines.
-* Add to favorite.
-* Play mode - Single Cycle/Repeat All/Shuffle.
-* Save/Open m3u file.
-* Tray icon, tray menu.
-* Multiple-languages support.
+* Resizable frameless window
+* Scroll song name if it's too long
+* Supports MP3 and WMA format audio file
+* Search by keywords
+* Lyric show - Single line/Multiple lines
+* Add to favorite
+* Play modes - Single Cycle/Repeat All/Shuffle
+* Save/Open m3u file
+* Tray icon and tray menu
+* Multiple-lingual
 
 ## TODO:
-* Audio Spectrum show.
-* Settings.
+* Audio Spectrum show
+* Settings
 
 ## Screenshot
 ![Screenshot](https://github.com/wn0112/PPlayer/blob/master/screenshot.png)
