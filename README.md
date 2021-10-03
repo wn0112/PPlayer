@@ -27,7 +27,7 @@ Music Player code by Python 2.7 and PyQt
 * Play modes - Single Cycle/Repeat All/Shuffle
 * Save/Open m3u file
 * Tray icon and tray menu
-* Multiple-lingual
+* Multilingual
 
 ## TODO:
 * Audio Spectrum show
