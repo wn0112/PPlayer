@@ -33,5 +33,5 @@ Music Player code by Python 2.7 and PyQt
 * Audio Spectrum show
 * Settings
 
-## Screenshot
-![Screenshot](https://github.com/wn0112/PPlayer/blob/master/screenshot.png)
+## UI
+![UI](https://github.com/HackersStation/PPlayer/blob/master/UI.png)
