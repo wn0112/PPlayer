@@ -35,3 +35,6 @@ Music Player code by Python 2.7 and PyQt
 
 ## UI
 ![UI](https://github.com/HackersStation/PPlayer/blob/master/UI.png)
+
+## Desktop lyric
+![UI](https://github.com/wn0112/PPlayer/blob/master/screenshot.png)
