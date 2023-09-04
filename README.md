@@ -1,6 +1,6 @@
 # PPlayer
 ## Introduction
-Music Player code by Python 2.7 and PyQt
+Music Player code by Python 2.7 and PyQt4
 
 ## OS
 * Windows 7, Windows 10 x86/x64, CHS/EN
